@@ -8,6 +8,7 @@ clap = { version = "4.6.1", features = ["derive"] }
 futures = "0.3.32"
 hex = "0.4.3"
 rand = "0.10.1"
+libc = "0.2"
 rand_chacha = "0.10.0"
 secp256k1 = { version = "0.31.1", features = ["rand", "global-context", "hashes"] }
 serde = { version = "1.0.228", features = ["derive"] }
@@ -16,3 +17,21 @@ sha2 = "0.11.0"
 tokio = { version = "1.52.3", features = ["full"] }
 tokio-tungstenite = "0.29.0"
 url = "2.5.8"
+
+# Web Server & Live Telemetry
+axum = { version = "0.8.1", features = ["ws"] }
+parking_lot = "0.12"
+tower = "0.5.2"
+tower-http = { version = "0.6.2", features = ["cors", "trace"] }
+
+# System Telemetry (Windows, Linux, macOS)
+sysinfo = "0.33.1"
+
+# In-process Flamegraph Engine
+inferno = "0.12.1"
+
+# Formatting & Reporting
+chrono = { version = "0.4.39", features = ["serde"] }
+comfy-table = "7.1.3"
+colored = "3.0.0"
+tempfile = "3.17.1"
