@@ -12,7 +12,7 @@ use crate::web::state::AppState;
 pub async fn start_web_server(port: u16, state: Arc<AppState>) -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/", get(routes::get_index))
-        .route("/assets/vue.min.js", get(routes::get_vue_js))
+        .route("/assets/alpine.min.js", get(routes::get_alpine_js))
         .route("/api/status", get(routes::get_status))
         .route("/api/commits", get(routes::get_commits))
         .route("/api/branches", get(routes::get_branches))
