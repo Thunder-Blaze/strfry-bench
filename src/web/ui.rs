@@ -813,11 +813,11 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                     <div class="suite-metrics-summary">
                                         <template x-if="completedMap[s.id]">
                                             <div style="display: flex; gap: 12px; align-items: center;">
-                                                <span style="color: var(--accent-lime); font-weight: 700;" x-text="completedMap[s.id].throughput ? completedMap[s.id].throughput.toFixed(1) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : ''"></span>
-                                                <span x-show="completedMap[s.id].p50_ms" x-text="'P50: ' + (completedMap[s.id].p50_ms ? completedMap[s.id].p50_ms.toFixed(2) + 'ms' : '')"></span>
-                                                <span x-show="completedMap[s.id].p99_ms" x-text="'P99: ' + (completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + 'ms' : '')"></span>
-                                                <span x-show="completedMap[s.id].memory_rss_mb" style="color: var(--accent-lavender);" x-text="'RSS: ' + (completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + 'MB' : '')"></span>
-                                                <span style="color: var(--text-muted);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + 's'"></span>
+                                                <span style="color: var(--accent-lime); font-weight: 700;" x-text="completedMap[s.id].throughput != null ? completedMap[s.id].throughput.toFixed(1) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : ''"></span>
+                                                <span x-show="completedMap[s.id].p50_ms" x-text="'P50: ' + (completedMap[s.id].p50_ms != null ? completedMap[s.id].p50_ms.toFixed(2) + 'ms' : '')"></span>
+                                                <span x-show="completedMap[s.id].p99_ms" x-text="'P99: ' + (completedMap[s.id].p99_ms != null ? completedMap[s.id].p99_ms.toFixed(2) + 'ms' : '')"></span>
+                                                <span x-show="completedMap[s.id].memory_rss_mb" style="color: var(--accent-lavender);" x-text="'RSS: ' + (completedMap[s.id].memory_rss_mb != null ? completedMap[s.id].memory_rss_mb.toFixed(1) + 'MB' : '')"></span>
+                                                <span style="color: var(--text-muted);" x-text="completedMap[s.id].elapsed_secs != null ? completedMap[s.id].elapsed_secs.toFixed(2) + 's' : ''"></span>
                                             </div>
                                         </template>
                                         <template x-if="!completedMap[s.id]">
@@ -846,7 +846,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                 <div class="stat-panel" x-show="completedMap[s.id].p50_ms && completedMap[s.id].p50_ms > 0">
                                                     <div class="stat-panel-title">Latency Quantiles</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
-                                                        <div x-show="completedMap[s.id].p50_ms">P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms.toFixed(2) + ' ms'"></span></div>
+                                                        <div x-show="completedMap[s.id].p50_ms">P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms != null ? completedMap[s.id].p50_ms.toFixed(2) + ' ms' : ''"></span></div>
                                                         <div x-show="completedMap[s.id].p90_ms">P90: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p90_ms ? completedMap[s.id].p90_ms.toFixed(2) + ' ms' : ''"></span></div>
                                                         <div x-show="completedMap[s.id].p95_ms">P95: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p95_ms ? completedMap[s.id].p95_ms.toFixed(2) + ' ms' : ''"></span></div>
                                                         <div x-show="completedMap[s.id].p99_ms">P99: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + ' ms' : ''"></span></div>
@@ -866,9 +866,9 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                 <div class="stat-panel" x-show="(completedMap[s.id].elapsed_secs && completedMap[s.id].elapsed_secs > 0) || (completedMap[s.id].memory_rss_mb && completedMap[s.id].memory_rss_mb > 0)">
                                                     <div class="stat-panel-title">Resources & Wall Time</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
-                                                        <div x-show="completedMap[s.id].memory_rss_mb && completedMap[s.id].memory_rss_mb > 0">Memory RSS: <span style="color: var(--accent-lavender);" x-text="completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + ' MB' : '-'"></span></div>
-                                                        <div x-show="completedMap[s.id].elapsed_secs && completedMap[s.id].elapsed_secs > 0">Duration: <span style="color: var(--text-primary);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + ' s'"></span></div>
-                                                        <div x-show="completedMap[s.id].metrics && completedMap[s.id].metrics.waf">WAF: <span style="color: var(--text-primary);" x-text="completedMap[s.id].metrics && completedMap[s.id].metrics.waf ? completedMap[s.id].metrics.waf.toFixed(2) + 'x' : ''"></span></div>
+                                                        <div x-show="completedMap[s.id].memory_rss_mb && completedMap[s.id].memory_rss_mb > 0">Memory RSS: <span style="color: var(--accent-lavender);" x-text="completedMap[s.id].memory_rss_mb != null ? completedMap[s.id].memory_rss_mb.toFixed(1) + ' MB' : ''"></span></div>
+                                                        <div x-show="completedMap[s.id].elapsed_secs && completedMap[s.id].elapsed_secs > 0">Duration: <span style="color: var(--text-primary);" x-text="completedMap[s.id].elapsed_secs != null ? completedMap[s.id].elapsed_secs.toFixed(2) + ' s' : ''"></span></div>
+                                                        <div x-show="completedMap[s.id].metrics && completedMap[s.id].metrics.waf">WAF: <span style="color: var(--text-primary);" x-text="completedMap[s.id].metrics && completedMap[s.id].metrics.waf != null ? completedMap[s.id].metrics.waf.toFixed(2) + 'x' : ''"></span></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1129,10 +1129,10 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
                                             <span style="font-weight: 600;" x-text="s.name"></span>
                                             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">
-                                                <span x-show="s.p50_ms" x-text="'P50: ' + s.p50_ms.toFixed(2) + 'ms'"></span>
-                                                <span x-show="s.p90_ms" x-text="' | P90: ' + s.p90_ms.toFixed(2) + 'ms'"></span>
-                                                <span x-show="s.p95_ms" x-text="' | P95: ' + s.p95_ms.toFixed(2) + 'ms'"></span>
-                                                <span x-show="s.p99_ms" x-text="' | P99: ' + s.p99_ms.toFixed(2) + 'ms'"></span>
+                                                <span x-show="s.p50_ms" x-text="s.p50_ms != null ? 'P50: ' + s.p50_ms.toFixed(2) + 'ms' : ''"></span>
+                                                <span x-show="s.p90_ms" x-text="s.p90_ms != null ? ' | P90: ' + s.p90_ms.toFixed(2) + 'ms' : ''"></span>
+                                                <span x-show="s.p95_ms" x-text="s.p95_ms != null ? ' | P95: ' + s.p95_ms.toFixed(2) + 'ms' : ''"></span>
+                                                <span x-show="s.p99_ms" x-text="s.p99_ms != null ? ' | P99: ' + s.p99_ms.toFixed(2) + 'ms' : ''"></span>
                                             </span>
                                         </div>
                                         <div class="quantile-bar">
@@ -1155,7 +1155,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                         <div class="bar-chart-row">
                                             <div class="bar-chart-label">
                                                 <span x-text="s.name"></span>
-                                                <span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                                <span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;" x-text="s.throughput != null ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
                                             </div>
                                             <div class="bar-chart-track">
                                                 <div class="bar-chart-fill" :style="'width: ' + Math.max(3, (s.throughput / getMaxThroughput()) * 100) + '%;'"></div>
@@ -1172,7 +1172,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                         <div class="bar-chart-row">
                                             <div class="bar-chart-label">
                                                 <span x-text="s.name"></span>
-                                                <span style="font-family: var(--font-mono); color: var(--accent-lavender); font-weight: 700;" x-text="s.memory_rss_mb ? s.memory_rss_mb.toFixed(1) + ' MB' : '-'"></span>
+                                                <span style="font-family: var(--font-mono); color: var(--accent-lavender); font-weight: 700;" x-text="s.memory_rss_mb != null ? s.memory_rss_mb.toFixed(1) + ' MB' : '-'"></span>
                                             </div>
                                             <div class="bar-chart-track">
                                                 <div class="bar-chart-fill" :style="'width: ' + Math.max(3, (s.memory_rss_mb / getMaxMemory()) * 100) + '%; background: var(--accent-lavender);'"></div>
