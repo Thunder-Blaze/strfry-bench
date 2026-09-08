@@ -743,13 +743,13 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                             <!-- Final Target -->
                             <div class="control-group">
-                                <label x-text="currentTestMode === 'compare' ? (compareCurrent ? 'Final: Current Codebase (Stashed)' : 'Final (Target Branch & Commit)') : 'Branch & Commit to Benchmark'"></label>
+                                <label x-text="currentTestMode === 'compare' ? (compareCurrent ? 'Final: Current Codebase (Working Tree)' : 'Final (Target Branch & Commit)') : (compareCurrent ? 'Target: Current Codebase (Working Tree)' : 'Branch & Commit to Benchmark')"></label>
                                 <div style="display: flex; gap: 6px;">
-                                    <select x-model="selectedTargetBranch" @change="onTargetBranchChanged()" :disabled="currentTestMode === 'compare' && compareCurrent" style="width: 130px;">
+                                    <select x-model="selectedTargetBranch" @change="onTargetBranchChanged()" :disabled="compareCurrent" style="width: 130px;">
                                         <template x-for="b in branches" :key="b"><option :value="b" x-text="b"></option></template>
                                     </select>
-                                    <select x-model="selectedTargetCommit" :disabled="currentTestMode === 'compare' && compareCurrent">
-                                        <template x-if="currentTestMode === 'compare' && compareCurrent">
+                                    <select x-model="selectedTargetCommit" :disabled="compareCurrent">
+                                        <template x-if="compareCurrent">
                                             <option value="current-codebase">(Current Codebase)</option>
                                         </template>
                                         <template x-for="c in targetCommits" :key="c.hash"><option :value="c.hash" x-text="c.short_hash + ' - ' + c.message.substring(0, 28)"></option></template>
@@ -781,8 +781,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                         <!-- Checkboxes Row -->
                         <div style="display: flex; gap: 20px; margin-top: 14px; font-size: 11px; color: var(--text-secondary); flex-wrap: wrap;">
-                            <label class="checkbox-label" x-show="currentTargetMode === 'source' && currentTestMode === 'compare'">
-                                <input type="checkbox" x-model="compareCurrent"> Compare Current Codebase (Stash)
+                            <label class="checkbox-label" x-show="currentTargetMode === 'source'">
+                                <input type="checkbox" x-model="compareCurrent"> Use Current Codebase (Working Tree)
                             </label>
                             <label class="checkbox-label" x-show="currentTargetMode === 'source'">
                                 <input type="checkbox" x-model="highPerformance"> High-Performance (make -j$(nproc))
@@ -843,9 +843,10 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                 <div class="stat-panel" x-show="completedMap[s.id].p50_ms && completedMap[s.id].p50_ms > 0">
                                                     <div class="stat-panel-title">Latency Quantiles</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
-                                                        <div>P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms ? completedMap[s.id].p50_ms.toFixed(2) + ' ms' : '-'"></span></div>
-                                                        <div>P90: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p90_ms ? completedMap[s.id].p90_ms.toFixed(2) + ' ms' : '-'"></span></div>
-                                                        <div>P99: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + ' ms' : '-'"></span></div>
+                                                        <div x-show="completedMap[s.id].p50_ms">P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms.toFixed(2) + ' ms'"></span></div>
+                                                        <div x-show="completedMap[s.id].p90_ms">P90: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p90_ms ? completedMap[s.id].p90_ms.toFixed(2) + ' ms' : ''"></span></div>
+                                                        <div x-show="completedMap[s.id].p95_ms">P95: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p95_ms ? completedMap[s.id].p95_ms.toFixed(2) + ' ms' : ''"></span></div>
+                                                        <div x-show="completedMap[s.id].p99_ms">P99: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + ' ms' : ''"></span></div>
                                                     </div>
                                                 </div>
                                                 <div class="stat-panel" x-show="getSuiteSpecificMetrics(completedMap[s.id]).length > 0">
@@ -1404,12 +1405,27 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     if (!suite || !suite.metrics || typeof suite.metrics !== 'object') return [];
                     const res = [];
                     for (const [k, v] of Object.entries(suite.metrics)) {
-                        if (k === 'process_rss_mb' || k === 'peak_rss_mb' || k === 'cpu_percent' || k === 'avg_cpu_percent' || k.includes('tps') || k === 'waf' || k === 'info') {
+                        if (k === 'process_rss_mb' || k === 'peak_rss_mb' || k === 'cpu_percent' || 
+                            k === 'avg_cpu_percent' || k.includes('tps') || k === 'waf' || 
+                            k === 'info' || k.includes('output') || k === 'mdb_stat' || 
+                            k === 'connection_memory' || typeof v === 'object' || typeof v === 'boolean') {
                             continue;
                         }
+                        if (typeof v === 'string' && (v.includes('\n') || v.length > 50)) {
+                            continue;
+                        }
+
                         let valStr = v;
                         if (typeof v === 'number') {
-                            valStr = v.toLocaleString();
+                            if (k.includes('_time') || k.includes('time_sec')) {
+                                valStr = v.toFixed(3) + ' s';
+                            } else if (k.includes('_mb')) {
+                                valStr = v.toFixed(2) + ' MB';
+                            } else if (Number.isInteger(v)) {
+                                valStr = v.toLocaleString();
+                            } else {
+                                valStr = v.toFixed(2);
+                            }
                         }
                         res.push({ key: k.replace(/_/g, ' '), val: valStr });
                     }
@@ -1459,9 +1475,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     this.expandedSuites = {};
                     this.logs = ['[BENCH] Triggering benchmark run from Web UI...'];
 
-                    const targetCommitVal = (this.currentTestMode === 'compare' && this.compareCurrent && this.currentTargetMode === 'source')
-                        ? "current-codebase"
-                        : this.selectedTargetCommit;
+                    const isCurrent = this.compareCurrent && this.currentTargetMode === 'source';
+                    const targetCommitVal = isCurrent ? "current-codebase" : this.selectedTargetCommit;
 
                     const req = {
                         target_mode: this.currentTargetMode,
@@ -1469,7 +1484,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         test_type: this.currentTestMode,
                         base: this.selectedBaseCommit,
                         target: targetCommitVal,
-                        current: this.currentTestMode === 'compare' && this.compareCurrent,
+                        current: isCurrent,
                         high_performance: this.highPerformance,
                         skip_heavy: this.skipHeavy,
                         flamegraph: this.flamegraph

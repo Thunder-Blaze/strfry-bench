@@ -155,15 +155,30 @@ impl Orchestrator {
     }
 
     async fn run_single_git_benchmark(&self, git: &GitManager, timestamp: &str) -> Result<PathBuf, String> {
+        let is_current = self.config.current || self.config.target == "current-codebase";
+        let target_ref = if is_current {
+            "current-codebase"
+        } else {
+            &self.config.target
+        };
+
+        let guard = if !is_current && target_ref != "HEAD" && !target_ref.is_empty() {
+            let g = StashGuard::enter(git, "strfry_bench_single")?;
+            git.checkout(target_ref)?;
+            Some(g)
+        } else {
+            None
+        };
+
         let commit = git.get_current_commit()?;
         let branch = git.get_current_branch().unwrap_or_else(|_| "HEAD".to_string());
         let short_commit = if commit.len() >= 7 { &commit[..7] } else { &commit };
 
-        let run_id = format!("{}_single_{}", timestamp, short_commit);
+        let run_id = format!("{}_single_{}", timestamp, if is_current { "current-codebase" } else { short_commit });
         let out_dir = self.config.output_dir.join(&run_id);
         std::fs::create_dir_all(&out_dir).map_err(|e| e.to_string())?;
 
-        self.log(&format!("[BENCH] Building strfry at {} ({})", branch, short_commit));
+        self.log(&format!("[BENCH] Building strfry at {} ({})", if is_current { "Current Codebase" } else { &branch }, short_commit));
         let builder = Builder::new(&git.repo_path, self.config.high_performance);
         let binary_path = builder.build_strfry()?;
 
@@ -247,9 +262,13 @@ impl Orchestrator {
         // Flamegraph already generated if requested
         let report = RunReport {
             id: run_id,
-            title: format!("strfry Benchmark - {} ({})", branch, short_commit),
+            title: if is_current {
+                format!("strfry Benchmark - Current Codebase ({})", short_commit)
+            } else {
+                format!("strfry Benchmark - {} ({})", branch, short_commit)
+            },
             test_type: TestType::Single,
-            target_ref: branch.clone(),
+            target_ref: if is_current { "current-codebase".to_string() } else { branch.clone() },
             git_commit: Some(commit),
             git_branch: Some(branch),
             timestamp: chrono::Local::now().to_rfc3339(),
@@ -258,6 +277,10 @@ impl Orchestrator {
             os_info: format!("{} ({})", sys_info.os_name, sys_info.kernel_version),
             cpu_info: format!("{} ({} cores)", sys_info.cpu_brand, sys_info.physical_cores),
         };
+
+        if let Some(mut g) = guard {
+            let _ = g.restore();
+        }
 
         write_single_report(&out_dir, &report)?;
         Ok(out_dir)
