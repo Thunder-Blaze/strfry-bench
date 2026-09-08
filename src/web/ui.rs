@@ -42,9 +42,14 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             font-family: var(--font-sans);
             line-height: 1.5;
             overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #app {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            width: 100%;
         }
 
         .icon {
@@ -541,6 +546,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             color: var(--text-muted);
             font-family: var(--font-mono);
             background: var(--bg-canvas);
+            margin-top: auto;
+            width: 100%;
         }
     </style>
 </head>
@@ -999,108 +1006,98 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                 <!-- 4. OVERHAULED ANALYTICS VIEW -->
                 <div x-show="activeTab === 'analytics'">
-                    <div class="page-title" style="margin-bottom: 20px;">
-                        <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lime); width: 18px; height: 18px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
-                        <span>Comprehensive Performance Analytics</span>
-                    </div>
-
-                    <!-- Latency Quantile Distribution -->
-                    <div class="config-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <div class="section-heading" style="margin-bottom: 0;">Latency Quantile Distribution (P50 · P90 · P95 · P99)</div>
-                            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Lower is better (ms)</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+                        <div class="page-title">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lime); width: 18px; height: 18px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                            <span>Performance Analytics</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 14px;">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                                    <span style="font-weight: 600;">Event Ingestion Pipeline</span>
-                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 2.07ms | P90: 3.16ms | P95: 3.70ms | P99: 4.70ms</span>
-                                </div>
-                                <div class="quantile-bar">
-                                    <div style="width: 20%; background: var(--accent-lime);" title="P50: 2.07ms"></div>
-                                    <div style="width: 15%; background: #a4db4a;" title="P90: 3.16ms"></div>
-                                    <div style="width: 10%; background: #e0b438;" title="P95: 3.70ms"></div>
-                                    <div style="width: 15%; background: var(--accent-red);" title="P99: 4.70ms"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                                    <span style="font-weight: 600;">Query Engine & Indices (Point Lookup)</span>
-                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 41.07ms | P90: 41.97ms | P95: 42.05ms | P99: 42.16ms</span>
-                                </div>
-                                <div class="quantile-bar">
-                                    <div style="width: 45%; background: var(--accent-lime);"></div>
-                                    <div style="width: 2%; background: #a4db4a;"></div>
-                                    <div style="width: 2%; background: #e0b438;"></div>
-                                    <div style="width: 2%; background: var(--accent-red);"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                                    <span style="font-weight: 600;">Active Monitors (Viral Post Fanout)</span>
-                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">TTFC: 102.0ms | TTLC: 102.5ms</span>
-                                </div>
-                                <div class="quantile-bar">
-                                    <div style="width: 60%; background: var(--accent-cyan);"></div>
-                                    <div style="width: 5%; background: var(--accent-lavender);"></div>
-                                </div>
-                            </div>
-                            <div>
-                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-                                    <span style="font-weight: 600;">Backpressure Latencies</span>
-                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 61.01ms | P90: 90.71ms | P99: 102.09ms</span>
-                                </div>
-                                <div class="quantile-bar">
-                                    <div style="width: 35%; background: var(--accent-lime);"></div>
-                                    <div style="width: 20%; background: #e0b438;"></div>
-                                    <div style="width: 10%; background: var(--accent-red);"></div>
-                                </div>
-                            </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Source:</span>
+                            <select x-model="selectedAnalyticsReportId" @change="onAnalyticsSourceChanged()" style="width: 380px;">
+                                <option value="live">Live / Current Benchmark Run</option>
+                                <template x-for="r in pastReports" :key="r">
+                                    <option :value="r" x-text="r.includes('compare') ? '[A/B COMPARISON] ' + r : '[SINGLE RUN] ' + r"></option>
+                                </template>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Throughput & Memory Scaling Grid -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="config-card">
-                            <div class="section-heading">Peak Throughput Ranking</div>
-                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>Storage Scan</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">611,231 eps</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 100%;"></div></div>
-                                </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>Point COUNT (NIP-45)</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">23,916 req/s</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 42%;"></div></div>
-                                </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>CLI Import</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">16,370 eps</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 28%;"></div></div>
-                                </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>Event Ingestion (50B)</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">8,331 eps</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 16%;"></div></div>
-                                </div>
+                    <!-- Empty State (When no benchmark data is available) -->
+                    <div x-show="getAnalyticsSuites().length === 0" class="config-card" style="text-align: center; padding: 56px 24px;">
+                        <div style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">No Benchmark Data Available</div>
+                        <div style="font-size: 13px; color: var(--text-muted); max-width: 480px; margin: 0 auto 20px auto; line-height: 1.5;">
+                            Execute a benchmark run from the <strong>Benchmark</strong> tab, or select a historical benchmark run from the dropdown above to view performance analytics.
+                        </div>
+                        <button class="btn-lime" @click="activeTab = 'runner'" style="display: inline-flex; align-items: center; gap: 6px;">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: #090a0f;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            Go to Benchmark Runner
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Analytics Content (When data is available) -->
+                    <div x-show="getAnalyticsSuites().length > 0" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Latency Quantile Distribution -->
+                        <div class="config-card" x-show="getAnalyticsLatencySuites().length > 0">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <div class="section-heading" style="margin-bottom: 0;">Latency Quantile Distribution (P50 · P90 · P95 · P99)</div>
+                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Lower is better (ms)</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 14px;">
+                                <template x-for="s in getAnalyticsLatencySuites()" :key="s.id">
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px;">
+                                            <span style="font-weight: 600;" x-text="s.name"></span>
+                                            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">
+                                                <span x-show="s.p50_ms" x-text="'P50: ' + s.p50_ms.toFixed(2) + 'ms'"></span>
+                                                <span x-show="s.p90_ms" x-text="' | P90: ' + s.p90_ms.toFixed(2) + 'ms'"></span>
+                                                <span x-show="s.p95_ms" x-text="' | P95: ' + s.p95_ms.toFixed(2) + 'ms'"></span>
+                                                <span x-show="s.p99_ms" x-text="' | P99: ' + s.p99_ms.toFixed(2) + 'ms'"></span>
+                                            </span>
+                                        </div>
+                                        <div class="quantile-bar">
+                                            <div :style="'width: ' + getQuantileWidth(s.p50_ms, getMaxLatency()) + '%; background: var(--accent-lime);'" :title="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) : '') + 'ms'"></div>
+                                            <div :style="'width: ' + getQuantileWidth((s.p90_ms || s.p50_ms) - s.p50_ms, getMaxLatency()) + '%; background: #a4db4a;'" :title="'P90: ' + (s.p90_ms ? s.p90_ms.toFixed(2) : '') + 'ms'"></div>
+                                            <div :style="'width: ' + getQuantileWidth((s.p95_ms || s.p90_ms || s.p50_ms) - (s.p90_ms || s.p50_ms), getMaxLatency()) + '%; background: #e0b438;'" :title="'P95: ' + (s.p95_ms ? s.p95_ms.toFixed(2) : '') + 'ms'"></div>
+                                            <div :style="'width: ' + getQuantileWidth((s.p99_ms || s.p95_ms || s.p50_ms) - (s.p95_ms || s.p90_ms || s.p50_ms), getMaxLatency()) + '%; background: var(--accent-red);'" :title="'P99: ' + (s.p99_ms ? s.p99_ms.toFixed(2) : '') + 'ms'"></div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
                         </div>
 
-                        <div class="config-card">
-                            <div class="section-heading">Connection Memory Scaling (VmRSS Progression)</div>
-                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>100 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">15.15 MB (151 KB/conn)</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 30%; background: var(--accent-lavender);"></div></div>
+                        <!-- Throughput & Memory Scaling Grid -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="config-card" x-show="getAnalyticsThroughputSuites().length > 0">
+                                <div class="section-heading">Peak Throughput Ranking</div>
+                                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                                    <template x-for="s in getAnalyticsThroughputSuites()" :key="s.id">
+                                        <div class="bar-chart-row">
+                                            <div class="bar-chart-label">
+                                                <span x-text="s.name"></span>
+                                                <span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                            </div>
+                                            <div class="bar-chart-track">
+                                                <div class="bar-chart-fill" :style="'width: ' + Math.max(3, (s.throughput / getMaxThroughput()) * 100) + '%;'"></div>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>500 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">15.32 MB (30 KB/conn)</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 32%; background: var(--accent-lavender);"></div></div>
-                                </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>1,000 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">16.80 MB (16 KB/conn)</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 36%; background: var(--accent-lavender);"></div></div>
-                                </div>
-                                <div class="bar-chart-row">
-                                    <div class="bar-chart-label"><span>3,000 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">20.80 MB (7 KB/conn)</span></div>
-                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 48%; background: var(--accent-lavender);"></div></div>
+                            </div>
+
+                            <div class="config-card" x-show="getAnalyticsMemorySuites().length > 0">
+                                <div class="section-heading">Process Memory Usage (VmRSS per Suite)</div>
+                                <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                                    <template x-for="s in getAnalyticsMemorySuites()" :key="s.id">
+                                        <div class="bar-chart-row">
+                                            <div class="bar-chart-label">
+                                                <span x-text="s.name"></span>
+                                                <span style="font-family: var(--font-mono); color: var(--accent-lavender); font-weight: 700;" x-text="s.memory_rss_mb ? s.memory_rss_mb.toFixed(1) + ' MB' : '-'"></span>
+                                            </div>
+                                            <div class="bar-chart-track">
+                                                <div class="bar-chart-fill" :style="'width: ' + Math.max(3, (s.memory_rss_mb / getMaxMemory()) * 100) + '%; background: var(--accent-lavender);'"></div>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </div>
@@ -1218,6 +1215,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                 pastSubView: 'paired',
                 pastMarkdownText: '',
 
+                selectedAnalyticsReportId: 'live',
+                analyticsReportData: null,
                 selectedFlamegraphReportId: '',
                 flamegraphFiles: [],
                 selectedFlamegraphFile: '',
@@ -1418,6 +1417,71 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                 async openAnalyticsTab() {
                     this.activeTab = 'analytics';
+                    await this.loadReportsList();
+                    if (this.selectedAnalyticsReportId !== 'live') {
+                        await this.onAnalyticsSourceChanged();
+                    }
+                },
+
+                async onAnalyticsSourceChanged() {
+                    if (this.selectedAnalyticsReportId === 'live') {
+                        this.analyticsReportData = null;
+                    } else {
+                        try {
+                            const res = await fetch(`/api/reports/${encodeURIComponent(this.selectedAnalyticsReportId)}`);
+                            this.analyticsReportData = await res.json();
+                        } catch (e) {
+                            this.analyticsReportData = null;
+                        }
+                    }
+                },
+
+                getAnalyticsSuites() {
+                    if (this.selectedAnalyticsReportId !== 'live' && this.analyticsReportData) {
+                        if (this.analyticsReportData.target_report && this.analyticsReportData.target_report.suites) {
+                            return this.analyticsReportData.target_report.suites;
+                        }
+                        if (this.analyticsReportData.suites) {
+                            return this.analyticsReportData.suites;
+                        }
+                    }
+                    return Object.values(this.completedMap);
+                },
+
+                getAnalyticsLatencySuites() {
+                    return this.getAnalyticsSuites().filter(s => s && (s.p50_ms || s.p90_ms || s.p99_ms));
+                },
+
+                getMaxLatency() {
+                    const lats = this.getAnalyticsLatencySuites().map(s => s.p99_ms || s.p95_ms || s.p90_ms || s.p50_ms || 0);
+                    return Math.max(...lats, 10);
+                },
+
+                getQuantileWidth(val, maxVal) {
+                    if (!val || !maxVal || maxVal <= 0) return 0;
+                    return Math.min(100, Math.max(1, (val / maxVal) * 100));
+                },
+
+                getAnalyticsThroughputSuites() {
+                    return this.getAnalyticsSuites()
+                        .filter(s => s && s.throughput && s.throughput > 0)
+                        .sort((a, b) => (b.throughput || 0) - (a.throughput || 0));
+                },
+
+                getMaxThroughput() {
+                    const tps = this.getAnalyticsThroughputSuites().map(s => s.throughput || 0);
+                    return Math.max(...tps, 1);
+                },
+
+                getAnalyticsMemorySuites() {
+                    return this.getAnalyticsSuites()
+                        .filter(s => s && s.memory_rss_mb && s.memory_rss_mb > 0)
+                        .sort((a, b) => (b.memory_rss_mb || 0) - (a.memory_rss_mb || 0));
+                },
+
+                getMaxMemory() {
+                    const mems = this.getAnalyticsMemorySuites().map(s => s.memory_rss_mb || 0);
+                    return Math.max(...mems, 1);
                 },
 
                 async loadReportsList() {
