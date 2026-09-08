@@ -13,7 +13,6 @@ use crate::web::ui::RENDERED_HTML;
 pub async fn get_index() -> Html<&'static str> {
     Html(RENDERED_HTML)
 }
-
 pub async fn get_alpine_js() -> impl IntoResponse {
     ([(axum::http::header::CONTENT_TYPE, "application/javascript")], crate::web::ui::ALPINE_JS)
 }

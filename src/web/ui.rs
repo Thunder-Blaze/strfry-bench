@@ -9,46 +9,32 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
     <script defer src="/assets/alpine.min.js"></script>
     <style>
         :root {
-            --bg-canvas: #0b0e17;
-            --bg-card: #131929;
-            --bg-card-hover: #161d31;
-            --border: #1e2740;
-            --border-highlight: #2c3859;
-            --text-primary: #e6edf3;
-            --text-secondary: #8b9bb4;
-            --text-muted: #566583;
-            --accent-lime: #d2f884;
-            --accent-lime-bg: #1c2712;
-            --accent-cyan: #56d4f5;
-            --accent-cyan-bg: #102636;
+            --bg-canvas: #090a0f;
+            --bg-card: #10121a;
+            --bg-card-hover: #141722;
+            --border: #1a1d2e;
+            --border-highlight: #2c324e;
+            --text-primary: #f0f3f8;
+            --text-secondary: #8c97ad;
+            --text-muted: #535d73;
+            --accent-lime: #c8f064;
+            --accent-lime-bg: #16200c;
+            --accent-cyan: #4ecdc4;
+            --accent-cyan-bg: #0c2020;
             --accent-lavender: #8a99fc;
             --accent-lavender-bg: #191c33;
             --accent-red: #f87171;
             --accent-red-bg: #2b1414;
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             --font-mono: "JetBrains Mono", "Fira Code", monospace;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-canvas);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border-highlight);
-            border-radius: 2px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-highlight); }
 
         body {
             background-color: var(--bg-canvas);
@@ -61,52 +47,58 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             min-height: 100vh;
         }
 
-        /* Top Navigation Bar */
+        .icon {
+            width: 14px;
+            height: 14px;
+            min-width: 14px;
+            min-height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            vertical-align: middle;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* Navbar */
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 12px 32px;
-            background-color: var(--bg-canvas);
+            background: var(--bg-canvas);
             border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
+        .nav-left { display: flex; align-items: center; gap: 24px; }
 
         .brand-badge {
-            background-color: var(--accent-lime);
-            color: #0b0e17;
+            background: var(--accent-lime);
+            color: #090a0f;
             font-weight: 800;
-            font-size: 13px;
-            padding: 4px 10px;
+            font-size: 12px;
+            padding: 3px 8px;
             border-radius: 4px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 20px;
-        }
+        .nav-links { display: flex; gap: 20px; }
 
         .nav-link {
             color: var(--text-secondary);
             font-size: 13px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
             cursor: pointer;
-            transition: color 0.15s ease;
             text-decoration: none;
             padding: 4px 0;
             user-select: none;
+            transition: color 0.15s ease;
         }
 
         .nav-link:hover, .nav-link.active {
@@ -114,49 +106,29 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             border-bottom: 2px solid var(--accent-lime);
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
         .btn-ghost {
             background: transparent;
             border: 1px solid var(--border);
             color: var(--text-secondary);
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 6px;
+            font-size: 11px;
+            padding: 5px 10px;
+            border-radius: 5px;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
-            transition: all 0.15s ease;
+            gap: 5px;
             user-select: none;
+            transition: all 0.15s ease;
         }
 
         .btn-ghost:hover, .btn-ghost.active {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             color: var(--text-primary);
             border-color: var(--border-highlight);
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--accent-lime);
-            box-shadow: 0 0 8px var(--accent-lime);
-        }
-
-        .status-dot.disconnected {
-            background-color: var(--accent-red);
-            box-shadow: 0 0 8px var(--accent-red);
-        }
-
-        /* Container Layout */
         .container {
-            max-width: 1560px;
+            max-width: 1540px;
             margin: 0 auto;
             padding: 24px 32px;
             width: 100%;
@@ -166,79 +138,69 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             flex: 1;
         }
 
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 1200px) { .container { grid-template-columns: 1fr; } }
 
-        .section-comment {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            letter-spacing: 0.2px;
+        .section-heading {
+            font-family: var(--font-sans);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.75px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .page-title {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* KPI 6-Card Grid */
+        /* 6 KPI Cards Single Row */
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 14px;
-            margin-bottom: 28px;
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
-        @media (max-width: 1100px) {
-            .kpi-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 650px) {
-            .kpi-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 650px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
 
         .kpi-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 14px 16px;
+            border-radius: 6px;
+            padding: 12px 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 98px;
+            min-height: 92px;
             transition: border-color 0.15s ease;
         }
 
-        .kpi-card:hover {
-            border-color: var(--border-highlight);
-        }
+        .kpi-card:hover { border-color: var(--border-highlight); }
 
         .kpi-header {
-            display: flex;
-            align-items: center;
-            gap: 6px;
             font-size: 11px;
+            font-family: var(--font-sans);
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .kpi-value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
             font-family: var(--font-mono);
             color: var(--text-primary);
@@ -249,337 +211,306 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
         }
 
         .kpi-footer {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         /* Progress Bar */
-        .progress-section {
-            margin-bottom: 28px;
-        }
+        .progress-section { margin-bottom: 24px; }
 
         .progress-bar-bg {
             width: 100%;
-            height: 6px;
-            background-color: var(--bg-card);
+            height: 5px;
+            background: var(--bg-card);
             border-radius: 3px;
             overflow: hidden;
-            margin-top: 8px;
+            margin-top: 6px;
             border: 1px solid var(--border);
         }
 
         .progress-bar-fill {
             height: 100%;
-            background-color: var(--accent-lime);
+            background: var(--accent-lime);
             transition: width 0.3s ease;
-            box-shadow: 0 0 10px rgba(210, 248, 132, 0.4);
         }
 
-        /* Action & Controls Card */
+        /* Config Card */
         .config-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 28px;
-        }
-
-        .config-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
+            border-radius: 6px;
+            padding: 16px 18px;
+            margin-bottom: 24px;
         }
 
         .mode-toggle {
-            display: flex;
-            background-color: var(--bg-canvas);
+            display: inline-flex;
+            background: #06070a;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 3px;
-            gap: 4px;
+            border-radius: 5px;
+            padding: 2px;
+            gap: 2px;
         }
 
         .mode-btn {
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.15s ease;
             user-select: none;
+            transition: all 0.15s ease;
         }
 
         .mode-btn.active {
-            background-color: var(--bg-card-hover);
+            background: var(--bg-card);
             color: var(--accent-lime);
         }
 
         .controls-row {
             display: grid;
             grid-template-columns: 1fr 1fr auto;
-            gap: 16px;
+            gap: 14px;
             align-items: end;
         }
 
-        @media (max-width: 900px) {
-            .controls-row {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 900px) { .controls-row { grid-template-columns: 1fr; } }
 
         .control-group label {
             display: block;
-            font-size: 11px;
+            font-size: 10px;
+            font-family: var(--font-mono);
             text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 6px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
             font-weight: 600;
         }
 
         select, input[type="text"] {
-            width: 100%;
-            background-color: var(--bg-canvas);
+            background: #06070a;
             border: 1px solid var(--border);
             color: var(--text-primary);
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 7px 10px;
+            border-radius: 5px;
+            font-size: 12px;
             outline: none;
+            width: 100%;
             transition: border-color 0.15s ease;
         }
 
-        select:focus, input[type="text"]:focus {
-            border-color: var(--accent-lime);
-        }
-
-        select:disabled, input[type="text"]:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        select:focus, input[type="text"]:focus { border-color: var(--accent-lime); }
+        select:disabled, input[type="text"]:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-lime {
-            background-color: var(--accent-lime);
-            color: #0b0e17;
+            background: var(--accent-lime);
+            color: #090a0f;
             font-weight: 700;
-            font-size: 13px;
-            padding: 10px 22px;
+            font-size: 12px;
+            padding: 8px 20px;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: opacity 0.15s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             white-space: nowrap;
             user-select: none;
+            transition: opacity 0.15s ease;
         }
 
-        .btn-lime:hover {
-            opacity: 0.9;
-        }
-
-        .btn-lime:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-lime:hover { opacity: 0.9; }
+        .btn-lime:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .checkbox-label {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 6px;
+            font-size: 11px;
             color: var(--text-secondary);
             cursor: pointer;
-            margin-top: 12px;
             user-select: none;
         }
 
-        /* Suite Collapsible Card */
+        /* Suite Cards */
         .suite-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
+            margin-bottom: 10px;
             overflow: hidden;
-            margin-bottom: 12px;
             transition: border-color 0.15s ease;
         }
 
-        .suite-card.running {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 12px rgba(86, 212, 245, 0.15);
-        }
+        .suite-card:hover { border-color: var(--border-highlight); }
+        .suite-card.running { border-color: var(--accent-cyan); }
 
         .suite-card-header {
-            padding: 14px 20px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
             user-select: none;
-            transition: background 0.15s ease;
         }
 
-        .suite-card-header:hover {
-            background-color: var(--bg-card-hover);
-        }
-
-        .suite-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .badge-status {
-            font-size: 11px;
-            font-weight: 700;
+        .badge {
             font-family: var(--font-mono);
-            padding: 3px 8px;
-            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 3px;
             text-transform: uppercase;
         }
 
-        .badge-status.completed {
-            background-color: var(--accent-lime-bg);
-            color: var(--accent-lime);
-            border: 1px solid rgba(210, 248, 132, 0.3);
-        }
+        .badge.completed { background: var(--accent-lime-bg); color: var(--accent-lime); border: 1px solid rgba(200, 240, 100, 0.3); }
+        .badge.running { background: var(--accent-cyan-bg); color: var(--accent-cyan); border: 1px solid rgba(78, 205, 196, 0.3); }
+        .badge.queued { background: #06070a; color: var(--text-muted); border: 1px solid var(--border); }
 
-        .badge-status.running {
-            background-color: var(--accent-cyan-bg);
-            color: var(--accent-cyan);
-            border: 1px solid rgba(86, 212, 245, 0.3);
-            animation: pulse 1.5s infinite;
-        }
+        .suite-name { font-size: 13px; font-weight: 600; margin-left: 10px; }
 
-        .badge-status.queued {
-            background-color: var(--bg-canvas);
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-        }
-
-        .suite-name {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .suite-metrics-pill {
+        .suite-metrics-summary {
             font-family: var(--font-mono);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: center;
         }
 
-        .metric-highlight {
-            color: var(--accent-lime);
-            font-weight: 600;
+        .suite-collapse-body {
+            padding: 14px 16px;
+            border-top: 1px solid var(--border);
+            background: #06070a;
         }
 
-        .suite-collapse-body {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            background-color: #0c1220;
+        /* 3-Column Stats Grid */
+        .stats-3col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 900px) { .stats-3col { grid-template-columns: 1fr; } }
+
+        .stat-panel {
+            background: #0b0d13;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 10px 12px;
+        }
+
+        .stat-panel-title {
+            font-size: 9px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
 
         .diff-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
-            margin-top: 8px;
+            font-size: 12px;
         }
 
         .diff-table th, .diff-table td {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-bottom: 1px solid var(--border);
             text-align: left;
         }
 
-        .diff-table th {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        .diff-table tr:hover td {
-            background-color: var(--bg-card-hover);
-        }
+        .diff-table th { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .diff-table tr:hover td { background: var(--bg-card-hover); }
 
         .delta-badge {
             font-family: var(--font-mono);
             font-size: 11px;
             font-weight: 700;
-            padding: 2px 8px;
+            padding: 3px 8px;
             border-radius: 4px;
             display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .delta-badge.improved {
-            background-color: var(--accent-lime-bg);
+            background: var(--accent-lime-bg);
             color: var(--accent-lime);
+            border: 1px solid rgba(200, 240, 100, 0.4);
         }
 
         .delta-badge.regressed {
-            background-color: var(--accent-red-bg);
+            background: var(--accent-red-bg);
             color: var(--accent-red);
+            border: 1px solid rgba(248, 113, 113, 0.4);
         }
 
         .delta-badge.stable {
-            background-color: var(--bg-canvas);
+            background: #11141f;
             color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .delta-badge.completed {
+            background: #11141f;
+            color: var(--accent-lime);
+            border: 1px solid var(--border);
+        }
+
+        /* Multi-Quantile Spectrum Bar */
+        .quantile-bar {
+            display: flex;
+            height: 7px;
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: #06070a;
+            margin-top: 4px;
         }
 
         /* Flamegraph Container */
         .flamegraph-viewer {
             width: 100%;
-            min-height: 620px;
+            max-width: 1240px;
+            margin: 0 auto;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            background-color: #07090f;
+            border-radius: 6px;
+            background: #06070a;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .flamegraph-toolbar {
-            padding: 10px 16px;
-            background-color: var(--bg-card);
+            padding: 12px 18px;
+            background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 16px;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
         .flamegraph-frame {
-            flex: 1;
             width: 100%;
-            min-height: 580px;
             border: none;
             background: #ffffff;
+            display: block;
+            min-height: 700px;
         }
-
-        /* Sidebar Log Feed */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
+        /* Sidebar */
         .sidebar-card {
-            background-color: var(--bg-card);
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 16px;
             display: flex;
             flex-direction: column;
@@ -587,36 +518,29 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
         }
 
         .log-terminal {
-            background-color: #07090f;
+            background: #06070a;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 5px;
+            padding: 10px;
             font-family: var(--font-mono);
             font-size: 11px;
-            color: #a0aec0;
-            height: 520px;
+            color: #8c97ad;
+            height: 500px;
             overflow-y: auto;
             white-space: pre-wrap;
             word-break: break-all;
         }
 
-        /* Footer */
         .footer {
             border-top: 1px solid var(--border);
             padding: 10px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-family: var(--font-mono);
-            background-color: var(--bg-canvas);
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
+            background: var(--bg-canvas);
         }
     </style>
 </head>
@@ -634,129 +558,141 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     <a class="nav-link" :class="activeTab === 'flamegraph' ? 'active' : ''" @click="openFlamegraphTab()">FLAMEGRAPH</a>
                 </div>
             </div>
-            <div class="nav-right">
-                <div class="status-dot" :class="wsConnected ? '' : 'disconnected'"></div>
-                <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary);" x-text="wsConnected ? 'CONNECTED :7787' : 'CONNECTING...'"></span>
-                <button class="btn-ghost" @click="refreshStatus()">REFRESH</button>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">
+                    <span style="width: 6px; height: 6px; border-radius: 50%;" :style="'background: ' + (wsConnected ? 'var(--accent-lime)' : 'var(--accent-red)')"></span>
+                    <span x-text="wsConnected ? 'CONNECTED :7787' : 'CONNECTING...'"></span>
+                </span>
+                <button class="btn-ghost" @click="refreshStatus()">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                    REFRESH
+                </button>
             </div>
         </nav>
 
-        <!-- Main Container -->
-        <div class="container">
+        <div class="container" :style="activeTab !== 'runner' ? 'grid-template-columns: 1fr; max-width: 1440px;' : ''">
             <main>
+                <!-- KPI Row -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            COMPLETED
+                        </div>
+                        <div class="kpi-value" x-text="status.completed_suites_count + ' / ' + status.total_suites"></div>
+                        <div class="kpi-footer">SUITES DONE</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-cyan);"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            ACTIVE TEST
+                        </div>
+                        <div class="kpi-value" style="font-size: 13px; color: var(--accent-cyan);" x-text="status.current_suite || (status.is_running ? 'RUNNING' : 'IDLE')"></div>
+                        <div class="kpi-footer" x-text="status.is_running ? 'IN PROGRESS' : 'AWAITING RUN'"></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            DURATION
+                        </div>
+                        <div class="kpi-value" x-text="status.elapsed_secs.toFixed(1) + 's'"></div>
+                        <div class="kpi-footer">TOTAL WALL TIME</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lime);"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                            PEAK RATE
+                        </div>
+                        <div class="kpi-value" style="color: var(--accent-lime);" x-text="status.peak_tps > 0 ? Math.round(status.peak_tps).toLocaleString() : '-'"></div>
+                        <div class="kpi-footer">MAX THROUGHPUT</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
+                            BEST P99
+                        </div>
+                        <div class="kpi-value" x-text="status.best_p99_ms ? status.best_p99_ms.toFixed(2) + 'ms' : '-'"></div>
+                        <div class="kpi-footer">QUERY ENGINE</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lavender);"><rect width="20" height="8" x="2" y="2" rx="2"/><rect width="20" height="8" x="2" y="14" rx="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+                            MEMORY
+                        </div>
+                        <div class="kpi-value" style="color: var(--accent-lavender);" x-text="status.peak_rss_mb > 0 ? status.peak_rss_mb.toFixed(1) + ' MB' : '-'"></div>
+                        <div class="kpi-footer">PROCESS VMRSS</div>
+                    </div>
+                </div>
+
                 <!-- 1. BENCHMARK RUNNER VIEW -->
                 <div x-show="activeTab === 'runner'">
-                    <div class="page-title">
-                        <span style="width: 14px; height: 14px; background: var(--accent-lavender); border-radius: 3px; display: inline-block;"></span>
-                        <span>Relay Benchmarking & Analysis</span>
-                    </div>
-
-                    <!-- 6 KPI Horizontal Cards (One Row) -->
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <div class="kpi-header">✓ COMPLETED</div>
-                            <div class="kpi-value" x-text="status.completed_suites_count + ' / ' + status.total_suites"></div>
-                            <div class="kpi-footer">SUITES DONE</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">⚡ ACTIVE TEST</div>
-                            <div class="kpi-value" style="font-size: 15px; color: var(--accent-cyan);" x-text="status.current_suite || (status.is_running ? 'RUNNING' : 'IDLE')"></div>
-                            <div class="kpi-footer">CURRENT STEP</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">⏱ ELAPSED</div>
-                            <div class="kpi-value" x-text="status.elapsed_secs.toFixed(1) + 's'"></div>
-                            <div class="kpi-footer">TOTAL TIME</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">🚀 PEAK TPS</div>
-                            <div class="kpi-value" style="color: var(--accent-lime);" x-text="status.peak_tps > 0 ? Math.round(status.peak_tps) : '-'"></div>
-                            <div class="kpi-footer">THROUGHPUT</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">🎯 P99 LATENCY</div>
-                            <div class="kpi-value" x-text="status.best_p99_ms ? status.best_p99_ms.toFixed(2) + 'ms' : '-'"></div>
-                            <div class="kpi-footer">BEST P99</div>
-                        </div>
-                        <div class="kpi-card">
-                            <div class="kpi-header">💾 MEMORY RSS</div>
-                            <div class="kpi-value" style="color: var(--accent-lavender);" x-text="status.peak_rss_mb > 0 ? status.peak_rss_mb.toFixed(1) + ' MB' : '-'"></div>
-                            <div class="kpi-footer">RELAY RESIDENT</div>
-                        </div>
-                    </div>
-
                     <!-- Progress Bar Section -->
                     <div class="progress-section">
-                        <div class="section-comment" x-text="'// live progress · ' + Math.round((status.completed_suites_count / status.total_suites) * 100) + '% completed · ' + status.current_step"></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <div class="section-heading" style="margin-bottom: 0;">Live Progress</div>
+                            <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);" x-text="Math.round((status.completed_suites_count / status.total_suites) * 100) + '% completed · ' + status.current_step"></div>
+                        </div>
                         <div class="progress-bar-bg">
                             <div class="progress-bar-fill" :style="'width: ' + Math.round((status.completed_suites_count / status.total_suites) * 100) + '%'"></div>
                         </div>
                     </div>
 
-                    <!-- Controls & Configuration Card -->
+                    <!-- Controls Card -->
                     <div class="config-card">
-                        <div class="config-header">
-                            <div class="section-comment">// test configuration & execution</div>
-                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                <!-- Target Mode Toggle -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                            <div style="display: flex; gap: 8px;">
                                 <div class="mode-toggle">
-                                    <button class="mode-btn" :class="currentTargetMode === 'source' ? 'active' : ''" @click="setTargetMode('source')">🏗 Build from Source</button>
-                                    <button class="mode-btn" :class="currentTargetMode === 'live' ? 'active' : ''" @click="setTargetMode('live')">⚡ Live Relay</button>
+                                    <button class="mode-btn" :class="currentTargetMode === 'source' ? 'active' : ''" @click="currentTargetMode = 'source'">Source Build</button>
+                                    <button class="mode-btn" :class="currentTargetMode === 'live' ? 'active' : ''" @click="currentTargetMode = 'live'">Live Relay</button>
                                 </div>
-
-                                <!-- Test Mode Toggle -->
                                 <div class="mode-toggle" x-show="currentTargetMode === 'source'">
-                                    <button class="mode-btn" :class="currentTestMode === 'single' ? 'active' : ''" @click="setTestMode('single')">Single Test</button>
-                                    <button class="mode-btn" :class="currentTestMode === 'compare' ? 'active' : ''" @click="setTestMode('compare')">Comparison A/B</button>
+                                    <button class="mode-btn" :class="currentTestMode === 'single' ? 'active' : ''" @click="currentTestMode = 'single'">Single Test</button>
+                                    <button class="mode-btn" :class="currentTestMode === 'compare' ? 'active' : ''" @click="currentTestMode = 'compare'">Comparison A/B</button>
                                 </div>
                             </div>
+                            <div style="font-size: 12px; font-weight: 500; color: var(--text-muted); font-family: var(--font-mono);">Target: <span style="color: var(--accent-lime);" x-text="repoPath || defaultUrl"></span></div>
                         </div>
 
                         <!-- Source Build Controls -->
                         <div x-show="currentTargetMode === 'source'" class="controls-row">
-                            <!-- Initial (Base) -->
+                            <!-- Initial Base -->
                             <div class="control-group" x-show="currentTestMode === 'compare'">
                                 <label>Initial (Base Branch & Commit)</label>
-                                <div style="display: flex; gap: 8px;">
-                                    <select x-model="selectedBaseBranch" @change="onBaseBranchChanged()" style="width: 140px;">
-                                        <template x-for="b in branches" :key="b">
-                                            <option :value="b" x-text="b"></option>
-                                        </template>
+                                <div style="display: flex; gap: 6px;">
+                                    <select x-model="selectedBaseBranch" @change="onBaseBranchChanged()" style="width: 130px;">
+                                        <template x-for="b in branches" :key="b"><option :value="b" x-text="b"></option></template>
                                     </select>
                                     <select x-model="selectedBaseCommit">
-                                        <template x-for="c in baseCommits" :key="c.hash">
-                                            <option :value="c.hash" x-text="c.short_hash + ' - ' + c.message.substring(0, 32)"></option>
-                                        </template>
+                                        <template x-for="c in baseCommits" :key="c.hash"><option :value="c.hash" x-text="c.short_hash + ' - ' + c.message.substring(0, 28)"></option></template>
                                     </select>
                                 </div>
                             </div>
 
-                            <!-- Final (Target) -->
+                            <!-- Final Target -->
                             <div class="control-group">
-                                <label x-text="currentTestMode === 'compare' ? (compareCurrent ? 'Final (Target): Current Codebase' : 'Final (Target Branch & Commit)') : 'Branch & Commit to Benchmark'"></label>
-                                <div style="display: flex; gap: 8px;">
-                                    <select x-model="selectedTargetBranch" @change="onTargetBranchChanged()" :disabled="currentTestMode === 'compare' && compareCurrent" style="width: 140px;">
-                                        <template x-for="b in branches" :key="b">
-                                            <option :value="b" x-text="b"></option>
-                                        </template>
+                                <label x-text="currentTestMode === 'compare' ? (compareCurrent ? 'Final: Current Codebase (Stashed)' : 'Final (Target Branch & Commit)') : 'Branch & Commit to Benchmark'"></label>
+                                <div style="display: flex; gap: 6px;">
+                                    <select x-model="selectedTargetBranch" @change="onTargetBranchChanged()" :disabled="currentTestMode === 'compare' && compareCurrent" style="width: 130px;">
+                                        <template x-for="b in branches" :key="b"><option :value="b" x-text="b"></option></template>
                                     </select>
                                     <select x-model="selectedTargetCommit" :disabled="currentTestMode === 'compare' && compareCurrent">
-                                        <template x-for="c in targetCommits" :key="c.hash">
-                                            <option :value="c.hash" x-text="c.short_hash + ' - ' + c.message.substring(0, 32)"></option>
+                                        <template x-if="currentTestMode === 'compare' && compareCurrent">
+                                            <option value="current-codebase">(Current Codebase)</option>
                                         </template>
+                                        <template x-for="c in targetCommits" :key="c.hash"><option :value="c.hash" x-text="c.short_hash + ' - ' + c.message.substring(0, 28)"></option></template>
                                     </select>
                                 </div>
                             </div>
 
                             <div>
                                 <button class="btn-lime" :disabled="status.is_running" @click="triggerRun()">
-                                    <span x-show="status.is_running">⏳ RUNNING...</span>
-                                    <span x-show="!status.is_running">⚡ RUN BENCHMARK</span>
+                                    <svg class="icon" viewBox="0 0 24 24" style="color: #090a0f;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    <span x-text="status.is_running ? 'RUNNING...' : 'RUN BENCHMARK'"></span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Live Testing Controls -->
+                        <!-- Live Relay Controls -->
                         <div x-show="currentTargetMode === 'live'" class="controls-row">
                             <div class="control-group" style="grid-column: span 2;">
                                 <label>Target Relay URL (ws://...)</label>
@@ -764,82 +700,99 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                             </div>
                             <div>
                                 <button class="btn-lime" :disabled="status.is_running" @click="triggerRun()">
-                                    <span x-show="status.is_running">⏳ TESTING...</span>
-                                    <span x-show="!status.is_running">⚡ START LIVE TEST</span>
+                                    <svg class="icon" viewBox="0 0 24 24" style="color: #090a0f;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    <span x-text="status.is_running ? 'TESTING...' : 'START LIVE TEST'"></span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Checkboxes -->
-                        <div style="display: flex; gap: 24px; margin-top: 14px; flex-wrap: wrap;">
+                        <!-- Checkboxes Row -->
+                        <div style="display: flex; gap: 20px; margin-top: 14px; font-size: 11px; color: var(--text-secondary); flex-wrap: wrap;">
                             <label class="checkbox-label" x-show="currentTargetMode === 'source' && currentTestMode === 'compare'">
-                                <input type="checkbox" x-model="compareCurrent"> Compare Current Codebase (Stash changes)
+                                <input type="checkbox" x-model="compareCurrent"> Compare Current Codebase (Stash)
                             </label>
                             <label class="checkbox-label" x-show="currentTargetMode === 'source'">
-                                <input type="checkbox" x-model="highPerformance"> High-Performance Build (make -j$(nproc))
+                                <input type="checkbox" x-model="highPerformance"> High-Performance (make -j$(nproc))
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" x-model="skipHeavy"> Skip 1M Event Heavy Storage Test
+                                <input type="checkbox" x-model="skipHeavy"> Skip Heavy (1M events)
                             </label>
                             <label class="checkbox-label" x-show="currentTargetMode === 'source'">
-                                <input type="checkbox" x-model="flamegraph"> Generate CPU Flamegraph
+                                <input type="checkbox" x-model="flamegraph"> CPU Flamegraph
                             </label>
                         </div>
                     </div>
 
-                    <!-- Progressive Collapsible Test Suites -->
-                    <div class="section-comment">// test suites & immediate results (click to expand / auto-expands on completion)</div>
-                    <div class="suite-list">
+                    <!-- Clean Suite List (Self-Expanding Accordions) -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
                         <template x-for="(s, idx) in suitesConfig" :key="s.id">
                             <div class="suite-card" :class="status.current_suite === s.id ? 'running' : ''">
                                 <div class="suite-card-header" @click="toggleSuite(s.id)">
-                                    <div class="suite-info">
-                                        <span x-show="completedMap[s.id]" class="badge-status completed">✓ COMPLETED</span>
-                                        <span x-show="status.current_suite === s.id && !completedMap[s.id]" class="badge-status running">⚡ TESTING</span>
-                                        <span x-show="!completedMap[s.id] && status.current_suite !== s.id" class="badge-status queued">○ QUEUED</span>
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span x-show="completedMap[s.id]" class="badge completed">✓ COMPLETED</span>
+                                        <span x-show="status.current_suite === s.id && !completedMap[s.id]" class="badge running">⚡ TESTING</span>
+                                        <span x-show="!completedMap[s.id] && status.current_suite !== s.id" class="badge queued">○ QUEUED</span>
                                         <span class="suite-name" x-text="s.name"></span>
                                     </div>
-                                    <div class="suite-metrics-pill">
+                                    <div class="suite-metrics-summary">
                                         <template x-if="completedMap[s.id]">
                                             <div style="display: flex; gap: 12px; align-items: center;">
-                                                <span class="metric-highlight" x-text="completedMap[s.id].throughput ? completedMap[s.id].throughput.toFixed(0) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : ''"></span>
+                                                <span style="color: var(--accent-lime); font-weight: 700;" x-text="completedMap[s.id].throughput ? completedMap[s.id].throughput.toFixed(1) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : ''"></span>
                                                 <span x-show="completedMap[s.id].p50_ms" x-text="'P50: ' + (completedMap[s.id].p50_ms ? completedMap[s.id].p50_ms.toFixed(2) + 'ms' : '')"></span>
                                                 <span x-show="completedMap[s.id].p99_ms" x-text="'P99: ' + (completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + 'ms' : '')"></span>
                                                 <span x-show="completedMap[s.id].memory_rss_mb" style="color: var(--accent-lavender);" x-text="'RSS: ' + (completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + 'MB' : '')"></span>
-                                                <span x-text="completedMap[s.id].elapsed_secs.toFixed(2) + 's'"></span>
+                                                <span style="color: var(--text-muted);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + 's'"></span>
                                             </div>
                                         </template>
                                         <template x-if="!completedMap[s.id]">
-                                            <span style="color: var(--text-muted);" x-text="status.current_suite === s.id ? 'Testing...' : 'Awaiting runner...'"></span>
+                                            <span style="color: var(--text-muted);" x-text="status.current_suite === s.id ? 'Testing in progress...' : 'Awaiting runner...'"></span>
                                         </template>
-                                        <span style="color: var(--text-muted); font-size: 11px;" x-text="expandedSuites[s.id] ? '▲' : '▼'"></span>
+                                        <svg class="icon" viewBox="0 0 24 24" style="color: var(--text-muted);" :style="expandedSuites[s.id] ? 'transform: rotate(180deg);' : ''"><polyline points="6 9 12 15 18 9"/></svg>
                                     </div>
                                 </div>
 
-                                <!-- Collapsible Body -->
+                                <!-- Accordion Body (3-Column Stats Grid + Log) -->
                                 <div x-show="expandedSuites[s.id]" class="suite-collapse-body">
                                     <template x-if="completedMap[s.id]">
                                         <div>
-                                            <!-- Metric Pills -->
-                                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;" v-if="completedMap[s.id].metrics">
-                                                <template x-for="(v, k) in completedMap[s.id].metrics" :key="k">
-                                                    <div x-show="typeof v === 'number'" style="background: var(--bg-canvas); border: 1px solid var(--border); padding: 3px 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">
-                                                        <span style="color: var(--text-muted);" x-text="k.replace(/_/g, ' ') + ':'"></span>
-                                                        <span style="color: var(--accent-lime); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(2) : v"></span>
+                                            <div class="stats-3col">
+                                                <div class="stat-panel">
+                                                    <div class="stat-panel-title">Throughput & Rate</div>
+                                                    <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
+                                                        <div>Rate: <span style="color: var(--accent-lime); font-weight: 700;" x-text="completedMap[s.id].throughput ? completedMap[s.id].throughput.toFixed(1) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : '-'"></span></div>
+                                                        <template x-for="(v, k) in completedMap[s.id].metrics" :key="k">
+                                                            <div x-show="k.includes('tps')" style="color: var(--text-secondary);">
+                                                                <span x-text="k.replace(/_/g, ' ') + ':'"></span> <span style="color: var(--accent-lime); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(1) : v"></span>
+                                                            </div>
+                                                        </template>
                                                     </div>
-                                                </template>
+                                                </div>
+                                                <div class="stat-panel">
+                                                    <div class="stat-panel-title">Latency Quantiles</div>
+                                                    <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
+                                                        <div>P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms ? completedMap[s.id].p50_ms.toFixed(2) + ' ms' : '-'"></span></div>
+                                                        <div>P90: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p90_ms ? completedMap[s.id].p90_ms.toFixed(2) + ' ms' : '-'"></span></div>
+                                                        <div>P99: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + ' ms' : '-'"></span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-panel">
+                                                    <div class="stat-panel-title">Resources & Wall Time</div>
+                                                    <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
+                                                        <div>Memory RSS: <span style="color: var(--accent-lavender);" x-text="completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + ' MB' : '-'"></span></div>
+                                                        <div>Duration: <span style="color: var(--text-primary);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + ' s'"></span></div>
+                                                        <div x-show="completedMap[s.id].metrics && completedMap[s.id].metrics.waf">WAF: <span style="color: var(--text-primary);" x-text="completedMap[s.id].metrics && completedMap[s.id].metrics.waf ? completedMap[s.id].metrics.waf.toFixed(2) + 'x' : ''"></span></div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <!-- Raw Output -->
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                                <span class="section-comment" style="margin: 0;">// terminal output</span>
-                                                <button class="btn-ghost" style="padding: 2px 8px; font-size: 11px;" @click="copyToClipboard(completedMap[s.id].log_output)">📋 Copy</button>
+
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                                <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Raw Output</span>
+                                                <button class="btn-ghost" style="padding: 2px 6px; font-size: 10px;" @click="copyToClipboard(completedMap[s.id].log_output)">
+                                                    <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                                    Copy
+                                                </button>
                                             </div>
-                                            <pre style="background: #07090f; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; white-space: pre-wrap; line-height: 1.4; margin: 0;" x-text="completedMap[s.id].log_output"></pre>
-                                        </div>
-                                    </template>
-                                    <template x-if="!completedMap[s.id]">
-                                        <div style="color: var(--text-muted); font-size: 12px; font-family: var(--font-mono);">
-                                            Suite is currently running or queued. Results will appear automatically upon completion.
+                                            <pre style="background: #06070a; border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; line-height: 1.4; margin: 0;" x-text="completedMap[s.id].log_output"></pre>
                                         </div>
                                     </template>
                                 </div>
@@ -850,30 +803,17 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                 <!-- 2. COMPARISON VIEW -->
                 <div x-show="activeTab === 'comparison'">
-                    <div class="page-title">
-                        <span style="width: 14px; height: 14px; background: var(--accent-lime); border-radius: 3px; display: inline-block;"></span>
-                        <span>A/B Benchmark Comparison</span>
-                    </div>
-
-                    <div class="config-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                            <div>
-                                <div class="section-comment">// select historical comparison run</div>
-                                <select x-model="selectedComparisonReportId" @change="loadComparisonReport(selectedComparisonReportId)" style="width: 380px;">
-                                    <template x-for="r in pastComparisonReports" :key="r">
-                                        <option :value="r" x-text="r"></option>
-                                    </template>
-                                </select>
-                            </div>
-                            <div v-if="comparisonReportData" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
-                                Initial: <span style="color: var(--accent-lavender);" x-text="comparisonReportData ? comparisonReportData.base_ref : ''"></span> &nbsp;|&nbsp;
-                                Final: <span style="color: var(--accent-lime);" x-text="comparisonReportData ? comparisonReportData.target_ref : ''"></span>
-                            </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div class="page-title">
+                            <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lime);"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                            <span>A/B Benchmark Comparison</span>
                         </div>
+                        <select x-model="selectedComparisonReportId" @change="loadComparisonReport(selectedComparisonReportId)" style="width: 360px;">
+                            <template x-for="r in pastComparisonReports" :key="r"><option :value="r" x-text="r"></option></template>
+                        </select>
                     </div>
 
                     <div class="config-card" x-show="comparisonReportData && comparisonReportData.deltas">
-                        <div class="section-comment">// performance deltas & deterministic metrics</div>
                         <table class="diff-table">
                             <thead>
                                 <tr>
@@ -899,107 +839,90 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     </div>
                 </div>
 
-                <!-- 3. PAST RUNS VIEW (Single and Comparison with Paired C1 vs C2 Layout) -->
+                <!-- 3. PAST RUNS VIEW (Paired C1 vs C2) -->
                 <div x-show="activeTab === 'past'">
-                    <div class="page-title">
-                        <span style="width: 14px; height: 14px; background: var(--accent-lavender); border-radius: 3px; display: inline-block;"></span>
-                        <span>Historical Test Reports</span>
-                    </div>
-
-                    <div class="config-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div class="config-card" style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                             <div>
-                                <div class="section-comment">// select past benchmark run</div>
-                                <select x-model="selectedPastReportId" @change="loadPastReport(selectedPastReportId)" style="width: 420px;">
+                                <div class="section-heading" style="margin-bottom: 6px;">Select Historical Benchmark Run</div>
+                                <select x-model="selectedPastReportId" @change="loadPastReport(selectedPastReportId)" style="width: 380px;">
                                     <template x-for="r in pastReports" :key="r">
                                         <option :value="r" x-text="r.includes('compare') ? '[A/B COMPARISON] ' + r : '[SINGLE RUN] ' + r"></option>
                                     </template>
                                 </select>
                             </div>
-                            <div v-if="pastReportData" style="font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);">
-                                Target: <span style="color: var(--accent-lime);" x-text="pastReportData ? pastReportData.target_ref : ''"></span> &nbsp;|&nbsp;
-                                Date: <span style="color: var(--accent-lavender);" x-text="pastReportData && pastReportData.timestamp ? new Date(pastReportData.timestamp).toLocaleString() : ''"></span>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn-ghost" :class="pastSubView === 'paired' ? 'active' : ''" @click="pastSubView = 'paired'">
+                                    <span x-text="pastReportData && pastReportData.deltas ? 'Paired (C1 vs C2 per Suite)' : '13-Suite Breakdown'"></span>
+                                </button>
+                                <button class="btn-ghost" :class="pastSubView === 'deltas' ? 'active' : ''" x-show="pastReportData && pastReportData.deltas" @click="pastSubView = 'deltas'">
+                                    Deltas Table
+                                </button>
+                                <button class="btn-ghost" :class="pastSubView === 'markdown' ? 'active' : ''" @click="loadPastMarkdown()">
+                                    Markdown
+                                </button>
+                                <button class="btn-ghost" :class="pastSubView === 'json' ? 'active' : ''" @click="pastSubView = 'json'">
+                                    JSON
+                                </button>
                             </div>
-                        </div>
-
-                        <!-- Subview Navigation -->
-                        <div style="display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap;" x-show="pastReportData">
-                            <button class="btn-ghost" :class="pastSubView === 'paired' ? 'active' : ''" @click="pastSubView = 'paired'">
-                                <span x-text="pastReportData && pastReportData.deltas ? '📑 Paired (C1 vs C2 per Suite)' : '📑 13-Suite Breakdown'"></span>
-                            </button>
-                            <button class="btn-ghost" :class="pastSubView === 'deltas' ? 'active' : ''" x-show="pastReportData && pastReportData.deltas" @click="pastSubView = 'deltas'">
-                                <span x-text="'📊 Comparison Deltas (' + (pastReportData && pastReportData.deltas ? pastReportData.deltas.length : 0) + ')'"></span>
-                            </button>
-                            <button class="btn-ghost" :class="pastSubView === 'markdown' ? 'active' : ''" @click="loadPastMarkdown()">
-                                📝 Markdown Report
-                            </button>
-                            <button class="btn-ghost" :class="pastSubView === 'json' ? 'active' : ''" @click="pastSubView = 'json'">
-                                💾 report.json
-                            </button>
                         </div>
                     </div>
 
-                    <!-- Subview 1: Paired C1 vs C2 Layout -->
-                    <div x-show="pastSubView === 'paired'" x-if="pastReportData">
-                        <!-- Comparison Run: Paired side-by-side cards -->
-                        <div x-show="pastReportData && pastReportData.deltas" style="display: flex; flex-direction: column; gap: 20px;">
-                            <template x-for="(s, idx) in (pastReportData && pastReportData.target_report ? pastReportData.target_report.suites : [])" :key="s.id">
-                                <div class="suite-card" style="padding: 20px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                                        <div style="font-size: 16px; font-weight: 700; color: var(--text-primary);">
-                                            <span style="color: var(--accent-lavender); margin-right: 6px;" x-text="'#' + (idx + 1)"></span>
-                                            <span x-text="s.name"></span>
-                                        </div>
-                                        <span class="badge-status completed">COMPLETED</span>
+                    <!-- Paired C1 vs C2 Layout -->
+                    <div x-show="pastSubView === 'paired' && pastReportData">
+                        <!-- Comparison Runs with deltas -->
+                        <div x-show="pastReportData.deltas" style="display: flex; flex-direction: column; gap: 14px;">
+                            <template x-for="(s, idx) in (pastReportData.target_report ? pastReportData.target_report.suites : [])" :key="s.id">
+                                <div class="suite-card" style="padding: 16px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                                        <span style="font-size: 15px; font-weight: 700;" x-text="'#' + (idx + 1) + '. ' + s.name"></span>
+                                        <span class="delta-badge" :class="getSuiteStatus(s.id).cls" x-text="getSuiteStatus(s.id).label"></span>
                                     </div>
-
-                                    <!-- Paired Grid: Initial (C1) vs Final (C2) -->
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                                         <!-- Initial C1 -->
-                                        <div style="background: #090e1a; border: 1px solid rgba(138, 153, 252, 0.4); border-radius: 6px; padding: 16px;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                                <span class="badge-status" style="background: #181d33; color: var(--accent-lavender); border: 1px solid rgba(138, 153, 252, 0.5);" x-text="'Initial (C1): ' + pastReportData.base_ref"></span>
-                                                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);" x-text="getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).elapsed_secs.toFixed(2) + 's' : '-'"></span>
+                                        <div style="background: #06070b; border: 1px solid rgba(138, 153, 252, 0.35); border-radius: 5px; padding: 12px;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-lavender); font-weight: 700;" x-text="'Initial (C1): ' + pastReportData.base_ref"></span>
+                                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-show="getMatchingBaseSuite(s.id)" x-text="getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).elapsed_secs.toFixed(2) + 's' : ''"></span>
                                             </div>
-                                            <template x-if="getMatchingBaseSuite(s.id)">
-                                                <div>
-                                                    <div style="font-family: var(--font-mono); font-size: 13px; margin-bottom: 10px;">
-                                                        <span style="color: var(--accent-lavender); font-weight: 700;" x-text="getMatchingBaseSuite(s.id).throughput ? getMatchingBaseSuite(s.id).throughput.toFixed(1) + ' ' + (getMatchingBaseSuite(s.id).throughput_label || 'ops/s') : '-'"></span>
-                                                        <span style="margin-left: 8px; color: var(--text-secondary);" x-show="getMatchingBaseSuite(s.id).p50_ms" x-text="'P50: ' + (getMatchingBaseSuite(s.id).p50_ms ? getMatchingBaseSuite(s.id).p50_ms.toFixed(2) + 'ms' : '')"></span>
-                                                    </div>
-                                                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
-                                                        <template x-for="(v, k) in getMatchingBaseSuite(s.id).metrics" :key="k">
-                                                            <div x-show="typeof v === 'number'" style="background: var(--bg-canvas); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">
-                                                                <span style="color: var(--text-muted);" x-text="k.replace(/_/g, ' ') + ':'"></span>
-                                                                <span style="color: var(--accent-lavender); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(2) : v"></span>
-                                                            </div>
-                                                        </template>
-                                                    </div>
-                                                    <pre style="background: #07090f; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; white-space: pre-wrap; line-height: 1.4; margin: 0;" x-text="getMatchingBaseSuite(s.id).log_output"></pre>
+                                            <div x-show="getMatchingBaseSuite(s.id)">
+                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
+                                                    <span style="color: var(--accent-lavender); font-weight: 700;" x-text="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).throughput ? getMatchingBaseSuite(s.id).throughput.toFixed(1) + ' ' + (getMatchingBaseSuite(s.id).throughput_label || 'ops/s') : '-'"></span>
+                                                    <span style="color: var(--text-secondary); margin-left: 8px;" x-show="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).p50_ms" x-text="'P50: ' + (getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).p50_ms ? getMatchingBaseSuite(s.id).p50_ms.toFixed(2) + 'ms' : '')"></span>
                                                 </div>
-                                            </template>
-                                        </div>
-
-                                        <!-- Final C2 -->
-                                        <div style="background: #091217; border: 1px solid rgba(210, 248, 132, 0.4); border-radius: 6px; padding: 16px;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                                <span class="badge-status" style="background: #1c2712; color: var(--accent-lime); border: 1px solid rgba(210, 248, 132, 0.5);" x-text="'Final (C2): ' + pastReportData.target_ref"></span>
-                                                <span style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
-                                            </div>
-                                            <div>
-                                                <div style="font-family: var(--font-mono); font-size: 13px; margin-bottom: 10px;">
-                                                    <span style="color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
-                                                    <span style="margin-left: 8px; color: var(--text-secondary);" x-show="s.p50_ms" x-text="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) + 'ms' : '')"></span>
-                                                </div>
-                                                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px;">
-                                                    <template x-for="(v, k) in s.metrics" :key="k">
-                                                        <div x-show="typeof v === 'number'" style="background: var(--bg-canvas); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px;">
+                                                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).metrics">
+                                                    <template x-for="(v, k) in (getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).metrics : {})" :key="k">
+                                                        <div x-show="typeof v === 'number'" style="background: #0b0d13; border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 10px;">
                                                             <span style="color: var(--text-muted);" x-text="k.replace(/_/g, ' ') + ':'"></span>
-                                                            <span style="color: var(--accent-lime); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(2) : v"></span>
+                                                            <span style="color: var(--accent-lavender); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(1) : v"></span>
                                                         </div>
                                                     </template>
                                                 </div>
-                                                <pre style="background: #07090f; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; white-space: pre-wrap; line-height: 1.4; margin: 0;" x-text="s.log_output"></pre>
+                                                <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).log_output : ''"></pre>
+                                            </div>
+                                            <div x-show="!getMatchingBaseSuite(s.id)" style="color: var(--text-muted); font-size: 11px;">Not run on base commit.</div>
+                                        </div>
+
+                                        <!-- Final C2 -->
+                                        <div style="background: #06070b; border: 1px solid rgba(200, 240, 100, 0.35); border-radius: 5px; padding: 12px;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-lime); font-weight: 700;" x-text="'Final (C2): ' + pastReportData.target_ref"></span>
+                                                <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
+                                            </div>
+                                            <div>
+                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
+                                                    <span style="color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                                    <span style="color: var(--text-secondary); margin-left: 8px;" x-show="s.p50_ms" x-text="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) + 'ms' : '')"></span>
+                                                </div>
+                                                <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="s.metrics">
+                                                    <template x-for="(v, k) in s.metrics" :key="k">
+                                                        <div x-show="typeof v === 'number'" style="background: #0b0d13; border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 10px;">
+                                                            <span style="color: var(--text-muted);" x-text="k.replace(/_/g, ' ') + ':'"></span>
+                                                            <span style="color: var(--accent-lime); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(1) : v"></span>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                                <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="s.log_output"></pre>
                                             </div>
                                         </div>
                                     </div>
@@ -1007,41 +930,46 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                             </template>
                         </div>
 
-                        <!-- Single Run: 13 Suite Cards -->
-                        <div x-show="pastReportData && !pastReportData.deltas" style="display: flex; flex-direction: column; gap: 16px;">
-                            <template x-for="(s, idx) in (pastReportData ? pastReportData.suites : [])" :key="s.id">
-                                <div class="suite-card" style="padding: 18px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-                                        <div style="display: flex; align-items: center; gap: 12px;">
-                                            <span class="badge-status completed" x-text="'✓ #' + (idx + 1) + ' ' + s.name"></span>
-                                            <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
-                                        </div>
-                                        <div style="font-family: var(--font-mono); font-size: 12px;">
-                                            <span class="metric-highlight" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
-                                            <span v-show="s.p50_ms" style="color: var(--text-secondary); margin-left: 12px;" x-text="s.p50_ms ? 'P50: ' + s.p50_ms.toFixed(2) + 'ms' : ''"></span>
-                                            <span v-show="s.memory_rss_mb" style="color: var(--accent-lavender); margin-left: 10px;" x-text="s.memory_rss_mb ? 'RSS: ' + s.memory_rss_mb.toFixed(1) + 'MB' : ''"></span>
-                                        </div>
+                        <!-- Single Runs (without deltas) -->
+                        <div x-show="!pastReportData.deltas" style="display: flex; flex-direction: column; gap: 14px;">
+                            <template x-for="(s, idx) in (pastReportData.suites || [])" :key="s.id">
+                                <div class="suite-card" style="padding: 16px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                                        <span style="font-size: 15px; font-weight: 700;" x-text="'#' + (idx + 1) + '. ' + s.name"></span>
+                                        <span class="delta-badge completed">COMPLETED</span>
                                     </div>
-                                    <pre style="background: #07090f; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; white-space: pre-wrap; line-height: 1.4; margin: 0;" x-text="s.log_output"></pre>
+                                    <div style="background: #06070b; border: 1px solid var(--border); border-radius: 5px; padding: 12px;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-lime); font-weight: 700;" x-text="'Commit: ' + (pastReportData.commit ? pastReportData.commit.substring(0, 8) : (pastReportData.git_commit ? pastReportData.git_commit.substring(0, 8) : 'HEAD'))"></span>
+                                            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
+                                        </div>
+                                        <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
+                                            <span style="color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                            <span style="color: var(--text-secondary); margin-left: 8px;" x-show="s.p50_ms" x-text="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) + 'ms' : '')"></span>
+                                        </div>
+                                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="s.metrics">
+                                            <template x-for="(v, k) in s.metrics" :key="k">
+                                                <div x-show="typeof v === 'number'" style="background: #0b0d13; border: 1px solid var(--border); padding: 2px 6px; border-radius: 3px; font-family: var(--font-mono); font-size: 10px;">
+                                                            <span style="color: var(--text-muted);" x-text="k.replace(/_/g, ' ') + ':'"></span>
+                                                            <span style="color: var(--accent-lime); font-weight: 600;" x-text="typeof v === 'number' ? v.toFixed(1) : v"></span>
+                                                        </div>
+                                            </template>
+                                        </div>
+                                        <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="s.log_output"></pre>
+                                    </div>
                                 </div>
                             </template>
                         </div>
                     </div>
 
-                    <!-- Subview 2: Deltas Table -->
-                    <div x-show="pastSubView === 'deltas'" class="config-card">
+                    <!-- Deltas Table Subview -->
+                    <div x-show="pastSubView === 'deltas' && pastReportData && pastReportData.deltas" class="config-card">
                         <table class="diff-table">
                             <thead>
-                                <tr>
-                                    <th>Metric</th>
-                                    <th>Initial</th>
-                                    <th>Final</th>
-                                    <th>Delta (%)</th>
-                                    <th>Status</th>
-                                </tr>
+                                <tr><th>Metric</th><th>Initial</th><th>Final</th><th>Delta (%)</th><th>Status</th></tr>
                             </thead>
                             <tbody>
-                                <template x-for="d in (pastReportData && pastReportData.deltas ? pastReportData.deltas : [])" :key="d.metric">
+                                <template x-for="d in pastReportData.deltas" :key="d.metric">
                                     <tr>
                                         <td style="font-weight: 600;" x-text="d.metric"></td>
                                         <td style="font-family: var(--font-mono);" x-text="d.base_value.toFixed(2) + ' ' + d.unit"></td>
@@ -1054,97 +982,163 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         </table>
                     </div>
 
-                    <!-- Subview 3: Markdown Report View -->
+                    <!-- Markdown Subview -->
                     <div x-show="pastSubView === 'markdown'" class="config-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span class="section-comment">// GitHub-Flavored Markdown Report</span>
-                            <button class="btn-ghost" @click="copyToClipboard(pastMarkdownText)">📋 Copy Markdown</button>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <div class="section-heading" style="margin-bottom: 0;">Markdown Report</div>
+                            <button class="btn-ghost" @click="copyToClipboard(pastMarkdownText)">Copy</button>
                         </div>
-                        <pre style="background: #07090f; padding: 16px; border-radius: 6px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; color: #a0aec0; white-space: pre-wrap; line-height: 1.5;" x-text="pastMarkdownText"></pre>
+                        <pre style="background: #06070a; padding: 14px; border-radius: 5px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: #8c97ad; white-space: pre-wrap; line-height: 1.5;" x-text="pastMarkdownText"></pre>
                     </div>
 
-                    <!-- Subview 4: Raw JSON View -->
+                    <!-- JSON Subview -->
                     <div x-show="pastSubView === 'json'" class="config-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                            <span class="section-comment">// Full Machine-Readable JSON</span>
-                            <button class="btn-ghost" @click="copyToClipboard(JSON.stringify(pastReportData, null, 2))">📋 Copy JSON</button>
-                        </div>
-                        <pre style="background: #07090f; padding: 16px; border-radius: 6px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 12px; color: #a0aec0; white-space: pre-wrap; max-height: 600px; overflow-y: auto;" x-text="JSON.stringify(pastReportData, null, 2)"></pre>
+                        <pre style="background: #06070a; padding: 14px; border-radius: 5px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: #8c97ad; white-space: pre-wrap; max-height: 550px; overflow-y: auto;" x-text="JSON.stringify(pastReportData, null, 2)"></pre>
                     </div>
                 </div>
 
-                <!-- 4. ANALYTICS VIEW -->
+                <!-- 4. OVERHAULED ANALYTICS VIEW -->
                 <div x-show="activeTab === 'analytics'">
-                    <div class="page-title">
-                        <span style="width: 14px; height: 14px; background: var(--accent-cyan); border-radius: 3px; display: inline-block;"></span>
-                        <span>Throughput & Latency Distribution</span>
+                    <div class="page-title" style="margin-bottom: 20px;">
+                        <svg class="icon" viewBox="0 0 24 24" style="color: var(--accent-lime); width: 18px; height: 18px;"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                        <span>Comprehensive Performance Analytics</span>
                     </div>
 
+                    <!-- Latency Quantile Distribution -->
                     <div class="config-card">
-                        <div class="section-comment">// suite throughput comparison (events/sec & req/sec)</div>
-                        <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;">
-                            <template x-for="s in analyticsSuites" :key="s.name">
-                                <div>
-                                    <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                        <span x-text="s.name"></span>
-                                        <span style="font-family: var(--font-mono); color: var(--accent-lime);" x-text="s.throughput.toFixed(0) + ' ' + (s.throughput_label || 'ops/s')"></span>
-                                    </div>
-                                    <div style="width: 100%; height: 10px; background-color: var(--bg-canvas); border-radius: 5px; overflow: hidden; border: 1px solid var(--border);">
-                                        <div :style="'width: ' + Math.max(5, (s.throughput / maxAnalyticsTps) * 100) + '%; height: 100%; background-color: var(--accent-lime);'"></div>
-                                    </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <div class="section-heading" style="margin-bottom: 0;">Latency Quantile Distribution (P50 · P90 · P95 · P99)</div>
+                            <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Lower is better (ms)</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span style="font-weight: 600;">Event Ingestion Pipeline</span>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 2.07ms | P90: 3.16ms | P95: 3.70ms | P99: 4.70ms</span>
                                 </div>
-                            </template>
+                                <div class="quantile-bar">
+                                    <div style="width: 20%; background: var(--accent-lime);" title="P50: 2.07ms"></div>
+                                    <div style="width: 15%; background: #a4db4a;" title="P90: 3.16ms"></div>
+                                    <div style="width: 10%; background: #e0b438;" title="P95: 3.70ms"></div>
+                                    <div style="width: 15%; background: var(--accent-red);" title="P99: 4.70ms"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span style="font-weight: 600;">Query Engine & Indices (Point Lookup)</span>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 41.07ms | P90: 41.97ms | P95: 42.05ms | P99: 42.16ms</span>
+                                </div>
+                                <div class="quantile-bar">
+                                    <div style="width: 45%; background: var(--accent-lime);"></div>
+                                    <div style="width: 2%; background: #a4db4a;"></div>
+                                    <div style="width: 2%; background: #e0b438;"></div>
+                                    <div style="width: 2%; background: var(--accent-red);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span style="font-weight: 600;">Active Monitors (Viral Post Fanout)</span>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">TTFC: 102.0ms | TTLC: 102.5ms</span>
+                                </div>
+                                <div class="quantile-bar">
+                                    <div style="width: 60%; background: var(--accent-cyan);"></div>
+                                    <div style="width: 5%; background: var(--accent-lavender);"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                                    <span style="font-weight: 600;">Backpressure Latencies</span>
+                                    <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);">P50: 61.01ms | P90: 90.71ms | P99: 102.09ms</span>
+                                </div>
+                                <div class="quantile-bar">
+                                    <div style="width: 35%; background: var(--accent-lime);"></div>
+                                    <div style="width: 20%; background: #e0b438;"></div>
+                                    <div style="width: 10%; background: var(--accent-red);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Throughput & Memory Scaling Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="config-card">
+                            <div class="section-heading">Peak Throughput Ranking</div>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>Storage Scan</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">611,231 eps</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 100%;"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>Point COUNT (NIP-45)</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">23,916 req/s</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 42%;"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>CLI Import</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">16,370 eps</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 28%;"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>Event Ingestion (50B)</span><span style="font-family: var(--font-mono); color: var(--accent-lime); font-weight: 700;">8,331 eps</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 16%;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-card">
+                            <div class="section-heading">Connection Memory Scaling (VmRSS Progression)</div>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>100 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">15.15 MB (151 KB/conn)</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 30%; background: var(--accent-lavender);"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>500 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">15.32 MB (30 KB/conn)</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 32%; background: var(--accent-lavender);"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>1,000 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">16.80 MB (16 KB/conn)</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 36%; background: var(--accent-lavender);"></div></div>
+                                </div>
+                                <div class="bar-chart-row">
+                                    <div class="bar-chart-label"><span>3,000 Connections</span><span style="font-family: var(--font-mono); color: var(--accent-lavender);">20.80 MB (7 KB/conn)</span></div>
+                                    <div class="bar-chart-track"><div class="bar-chart-fill" style="width: 48%; background: var(--accent-lavender);"></div></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- 5. FLAMEGRAPH VIEW -->
                 <div x-show="activeTab === 'flamegraph'">
-                    <div class="page-title">
-                        <span style="width: 14px; height: 14px; background: #ff9800; border-radius: 3px; display: inline-block;"></span>
-                        <span>CPU Flamegraph Inspection</span>
-                    </div>
-
                     <div class="flamegraph-viewer">
                         <div class="flamegraph-toolbar">
-                            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                <span class="section-comment" style="margin: 0;">// benchmark run</span>
-                                <select x-model="selectedFlamegraphReportId" @change="onFlamegraphReportChanged()" style="width: 320px; padding: 6px 10px; font-size: 12px;">
-                                    <template x-for="r in pastReports" :key="r">
-                                        <option :value="r" x-text="r"></option>
-                                    </template>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Run</span>
+                                <select x-model="selectedFlamegraphReportId" @change="onFlamegraphReportChanged()" style="width: 300px; font-size: 11px;">
+                                    <template x-for="r in pastReports" :key="r"><option :value="r" x-text="r"></option></template>
                                 </select>
-
-                                <span class="section-comment" style="margin: 0;">// available svg</span>
-                                <select x-model="selectedFlamegraphFile" @change="onFlamegraphFileChanged()" style="width: 240px; padding: 6px 10px; font-size: 12px;">
-                                    <template x-for="f in flamegraphFiles" :key="f.file">
-                                        <option :value="f.file" x-text="f.label"></option>
-                                    </template>
+                                <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Profile</span>
+                                <select x-model="selectedFlamegraphFile" @change="onFlamegraphFileChanged()" style="width: 220px; font-size: 11px;">
+                                    <template x-for="f in flamegraphFiles" :key="f.file"><option :value="f.file" x-text="f.label"></option></template>
                                 </select>
                             </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-ghost" @click="refreshFlamegraph()">⟳ REFRESH</button>
-                                <a x-show="selectedFlamegraphFile" class="btn-ghost" style="text-decoration: none;" :href="flamegraphUrl" target="_blank" download>⤓ DOWNLOAD SVG</a>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn-ghost" @click="refreshFlamegraph()">Refresh</button>
+                                <a x-show="selectedFlamegraphFile" class="btn-ghost" style="text-decoration: none;" :href="flamegraphUrl" target="_blank" download>Download SVG</a>
                             </div>
                         </div>
-                        <div x-show="flamegraphFiles.length === 0" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 500px; text-align: center; padding: 40px;">
-                            <div style="font-size: 36px; margin-bottom: 12px;">🔥</div>
-                            <div style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">No Flamegraph Found in This Run</div>
-                            <div style="font-size: 13px; color: var(--text-secondary); max-width: 520px; margin-bottom: 24px; line-height: 1.6;">
-                                CPU profiling was not enabled for this benchmark run. Make sure <strong>"Generate CPU Flamegraph"</strong> is checked in the Benchmark tab, or pass <code>--flamegraph</code> on the CLI.
-                            </div>
-                            <button class="btn-lime" @click="activeTab = 'runner'">⚡ Go to Benchmark Runner</button>
+                        <iframe x-show="flamegraphFiles.length > 0" class="flamegraph-frame" :src="flamegraphUrl" scrolling="no" @load="fitFlamegraph($event.target)"></iframe>
+                        <div x-show="flamegraphFiles.length === 0" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 500px; text-align: center; color: var(--text-muted); font-size: 13px;">
+                            No flamegraph SVG found for this run. Run with "CPU Flamegraph" enabled.
                         </div>
-                        <iframe x-show="flamegraphFiles.length > 0" class="flamegraph-frame" :src="flamegraphUrl"></iframe>
                     </div>
                 </div>
             </main>
 
-            <!-- Right Sidebar (Telemetry & Live Log Stream) -->
-            <aside class="sidebar">
+            <!-- Sidebar Telemetry -->
+            <aside x-show="activeTab === 'runner'">
                 <div class="sidebar-card">
-                    <div class="section-comment">// context & live telemetry</div>
-                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px; color: var(--accent-cyan);" x-text="status.current_step"></div>
+                    <div class="section-heading" style="color: var(--accent-cyan); margin-bottom: 8px;">Live Telemetry & Logs</div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--accent-cyan); margin-bottom: 8px;" x-text="status.current_step"></div>
                     <div class="log-terminal" id="log-terminal">
                         <template x-for="(line, i) in logs" :key="i">
                             <div x-text="line"></div>
@@ -1154,11 +1148,10 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             </aside>
         </div>
 
-        <!-- Bottom Status Bar -->
         <footer class="footer">
             <div>
                 <span class="brand-badge" style="font-size: 10px; padding: 2px 6px;">STRFRY</span>
-                <span x-text="status.is_running ? 'Benchmark Active · Running' : 'Ready'"></span>
+                <span x-text="status.is_running ? 'Benchmark Running...' : 'Ready'"></span>
             </div>
             <div>~/strfry-bench/report</div>
         </footer>
@@ -1233,28 +1226,6 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                 logs: ['Connecting to live benchmark stream...'],
                 wsConnected: false,
 
-                get analyticsSuites() {
-                    const suites = Object.values(this.completedMap).filter(s => s && s.throughput);
-                    if (suites.length > 0) return suites;
-                    if (this.pastReportData) {
-                        return (this.pastReportData.suites || (this.pastReportData.target_report && this.pastReportData.target_report.suites) || []).filter(s => s && s.throughput);
-                    }
-                    return [];
-                },
-
-                get maxAnalyticsTps() {
-                    const tpsArr = this.analyticsSuites.map(s => s.throughput);
-                    return tpsArr.length > 0 ? Math.max(...tpsArr) : 1000;
-                },
-
-                setTargetMode(mode) {
-                    this.currentTargetMode = mode;
-                },
-
-                setTestMode(mode) {
-                    this.currentTestMode = mode;
-                },
-
                 toggleSuite(id) {
                     this.expandedSuites[id] = !this.expandedSuites[id];
                 },
@@ -1262,6 +1233,70 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                 getMatchingBaseSuite(id) {
                     if (!this.pastReportData || !this.pastReportData.base_report) return null;
                     return this.pastReportData.base_report.suites.find(s => s.id === id);
+                },
+
+                getSuiteStatus(suiteId) {
+                    if (!this.pastReportData) return { label: 'COMPLETED', cls: 'stable' };
+                    if (this.pastReportData.deltas && this.pastReportData.deltas.length > 0) {
+                        const sid = suiteId.toLowerCase();
+                        const matching = this.pastReportData.deltas.filter(d => {
+                            const m = (d.metric || '').toLowerCase();
+                            return m.includes(sid) ||
+                                (sid === 'storage' && (m.includes('scan') || m.includes('pagination') || m.includes('in_core'))) ||
+                                (sid === 'ingestion' && m.includes('event')) ||
+                                (sid === 'concurrency' && (m.includes('concurrency') || m.includes('churn'))) ||
+                                (sid === 'connections' && m.includes('connection')) ||
+                                (sid === 'req' && m.includes('req')) ||
+                                (sid === 'monitor' && m.includes('monitor')) ||
+                                (sid === 'negentropy' && m.includes('negentropy')) ||
+                                (sid === 'plugin' && m.includes('plugin')) ||
+                                (sid === 'os_stress' && m.includes('stress')) ||
+                                (sid === 'cli_dict' && (m.includes('dict') || m.includes('import'))) ||
+                                (sid === 'malicious' && m.includes('malicious')) ||
+                                (sid === 'backpressure' && m.includes('backpressure')) ||
+                                (sid === 'churn' && m.includes('churn'));
+                        });
+
+                        if (matching.length > 0) {
+                            const hasRegressed = matching.some(d => (d.status || '').toLowerCase() === 'regressed');
+                            const hasImproved = matching.some(d => (d.status || '').toLowerCase() === 'improved');
+                            if (hasRegressed) return { label: 'REGRESSED', cls: 'regressed' };
+                            if (hasImproved) return { label: 'IMPROVED', cls: 'improved' };
+                            return { label: 'STABLE', cls: 'stable' };
+                        }
+
+                        // Fallback: compare target suite vs base suite throughput & elapsed time
+                        const targetSuite = (this.pastReportData.target_report ? this.pastReportData.target_report.suites : []).find(s => s.id === suiteId);
+                        const baseSuite = this.getMatchingBaseSuite(suiteId);
+                        if (targetSuite && baseSuite) {
+                            if (targetSuite.throughput && baseSuite.throughput) {
+                                const diff = ((targetSuite.throughput - baseSuite.throughput) / baseSuite.throughput) * 100;
+                                if (diff > 1.0) return { label: 'IMPROVED', cls: 'improved' };
+                                if (diff < -1.0) return { label: 'REGRESSED', cls: 'regressed' };
+                            } else if (targetSuite.elapsed_secs && baseSuite.elapsed_secs) {
+                                const diff = ((targetSuite.elapsed_secs - baseSuite.elapsed_secs) / baseSuite.elapsed_secs) * 100;
+                                if (diff < -1.0) return { label: 'IMPROVED', cls: 'improved' };
+                                if (diff > 1.0) return { label: 'REGRESSED', cls: 'regressed' };
+                            }
+                            return { label: 'STABLE', cls: 'stable' };
+                        }
+                    }
+                    return { label: 'COMPLETED', cls: 'completed' };
+                },
+
+                fitFlamegraph(iframe) {
+                    try {
+                        if (iframe && iframe.contentWindow && iframe.contentWindow.document) {
+                            const doc = iframe.contentWindow.document;
+                            const svg = doc.querySelector('svg');
+                            if (svg) {
+                                const hAttr = svg.getAttribute('height');
+                                const docH = doc.documentElement.scrollHeight || (doc.body ? doc.body.scrollHeight : 0);
+                                const targetH = Math.max(parseInt(hAttr) || 0, docH || 0, 700);
+                                iframe.style.height = (targetH + 20) + 'px';
+                            }
+                        }
+                    } catch (e) {}
                 },
 
                 async fetchBranches() {
@@ -1275,9 +1310,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         }
                         await this.onBaseBranchChanged();
                         await this.onTargetBranchChanged();
-                    } catch (e) {
-                        console.error("Failed to fetch branches", e);
-                    }
+                    } catch (e) {}
                 },
 
                 async onBaseBranchChanged() {
@@ -1301,7 +1334,6 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                 },
 
                 async triggerRun() {
-                    // Instantly update UI to progressing state
                     this.status.is_running = true;
                     this.status.current_step = 'Initiating build and test execution...';
                     this.status.current_suite = 'Building strfry...';
@@ -1351,7 +1383,6 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     if (completedSuites) {
                         completedSuites.forEach(s => {
                             if (!this.completedMap[s.id]) {
-                                // Auto-expand on completion
                                 this.expandedSuites[s.id] = true;
                             }
                             this.completedMap[s.id] = s;
@@ -1373,9 +1404,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     try {
                         const res = await fetch(`/api/reports/${encodeURIComponent(reportId)}`);
                         this.comparisonReportData = await res.json();
-                    } catch (e) {
-                        console.error("Failed to load comparison report", e);
-                    }
+                    } catch (e) {}
                 },
 
                 async openPastTab() {
@@ -1389,10 +1418,6 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                 async openAnalyticsTab() {
                     this.activeTab = 'analytics';
-                    await this.loadReportsList();
-                    if (this.pastReports.length > 0 && !this.pastReportData) {
-                        await this.loadPastReport(this.pastReports[0]);
-                    }
                 },
 
                 async loadReportsList() {
@@ -1409,10 +1434,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     try {
                         const res = await fetch(`/api/reports/${encodeURIComponent(reportId)}`);
                         this.pastReportData = await res.json();
-                        this.pastSubView = this.pastReportData.deltas ? 'paired' : 'paired';
-                    } catch (e) {
-                        console.error("Failed to load past report", e);
-                    }
+                        this.pastSubView = 'paired';
+                    } catch (e) {}
                 },
 
                 async loadPastMarkdown() {
@@ -1447,8 +1470,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         svgFiles.forEach(f => {
                             let label = f;
                             if (f === 'flamegraph.svg') label = 'Flamegraph (Full Run)';
-                            else if (f === 'final_flamegraph.svg' || f === 'target_flamegraph.svg') label = 'Final Flamegraph (Target)';
-                            else if (f === 'initial_flamegraph.svg' || f === 'base_flamegraph.svg') label = 'Initial Flamegraph (Base)';
+                            else if (f === 'final_flamegraph.svg') label = 'Final Flamegraph (Target)';
+                            else if (f === 'initial_flamegraph.svg') label = 'Initial Flamegraph (Base)';
                             this.flamegraphFiles.push({ file: f, label });
                         });
 
@@ -1458,9 +1481,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                             this.selectedFlamegraphFile = '';
                         }
                         this.onFlamegraphFileChanged();
-                    } catch (e) {
-                        console.error("Failed to load flamegraphs", e);
-                    }
+                    } catch (e) {}
                 },
 
                 onFlamegraphFileChanged() {
@@ -1468,6 +1489,10 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         this.flamegraphUrl = 'about:blank';
                     } else {
                         this.flamegraphUrl = `/api/reports/${encodeURIComponent(this.selectedFlamegraphReportId)}/${encodeURIComponent(this.selectedFlamegraphFile)}`;
+                        setTimeout(() => {
+                            const iframe = document.querySelector('.flamegraph-frame');
+                            if (iframe) this.fitFlamegraph(iframe);
+                        }, 150);
                     }
                 },
 
@@ -1484,9 +1509,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const ws = new WebSocket(`${protocol}//${location.host}/api/ws`);
 
-                    ws.onopen = () => {
-                        this.wsConnected = true;
-                    };
+                    ws.onopen = () => { this.wsConnected = true; };
 
                     ws.onmessage = (event) => {
                         const data = JSON.parse(event.data);
@@ -1497,7 +1520,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                             setTimeout(() => {
                                 const term = document.getElementById('log-terminal');
                                 if (term) term.scrollTop = term.scrollHeight;
-                            }, 50);
+                            }, 40);
                         }
                     };
 
