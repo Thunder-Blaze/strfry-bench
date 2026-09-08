@@ -618,7 +618,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div id="app" x-data="benchApp()" x-init="init()">
+    <div id="app" x-data="benchApp()">
         <!-- Top Navigation Bar -->
         <nav class="navbar">
             <div class="nav-left">
@@ -1706,9 +1706,16 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     navigator.clipboard.writeText(text);
                 },
 
+                ws: null,
+
                 connectWs() {
+                    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+                        return;
+                    }
+
                     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const ws = new WebSocket(`${protocol}//${location.host}/api/ws`);
+                    this.ws = ws;
 
                     ws.onopen = () => { this.wsConnected = true; };
 
@@ -1727,10 +1734,10 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
 
                     ws.onclose = () => {
                         this.wsConnected = false;
+                        this.ws = null;
                         setTimeout(() => this.connectWs(), 2000);
                     };
                 },
-
                 init() {
                     this.fetchBranches();
                     this.loadReportsList();
