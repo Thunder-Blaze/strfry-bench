@@ -75,6 +75,21 @@ pub async fn run(
                     break;
                 }
             }
+         }
+     }
+
+    // If candidate files weren't on disk, compile embedded ALLOC_TRACKER_C
+    if !has_tracker {
+        let c_path = temp_dir.join("alloc_tracker.c");
+        if fs::write(&c_path, crate::builder::ALLOC_TRACKER_C).is_ok() {
+            let res = Command::new("gcc")
+                .args(["-shared", "-fPIC", "-o", tracker_so.to_str().unwrap(), c_path.to_str().unwrap(), "-ldl"])
+                .output();
+            if let Ok(out) = res {
+                if out.status.success() {
+                    has_tracker = true;
+                }
+            }
         }
     }
 
