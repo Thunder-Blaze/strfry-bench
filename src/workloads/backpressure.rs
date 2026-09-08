@@ -23,6 +23,10 @@ pub async fn run_backpressure_suite(
         "Backpressure Suite: {} fast clients, {} slow clients ({}ms delay), {} events...",
         fast_clients, slow_clients, slow_delay, count
     ));
+    let secp = Secp256k1::new();
+    let secret = secp256k1::SecretKey::new(&mut secp256k1::rand::rng());
+    let keypair = Keypair::from_secret_key(&secp, &secret);
+    let bench_pubkey = keypair.public_key().x_only_public_key().0.to_string();
 
     let fast_success = Arc::new(AtomicUsize::new(0));
     let fast_latencies = Arc::new(Mutex::new(Vec::new()));
@@ -32,34 +36,42 @@ pub async fn run_backpressure_suite(
         let url = url.to_string();
         let succ = fast_success.clone();
         let lats = fast_latencies.clone();
+        let target_pubkey = bench_pubkey.clone();
 
         fast_tasks.push(tokio::spawn(async move {
             if let Ok(mut ws) = connect(&url).await {
                 let subid = format!("fast-{}", i);
-                let msg = serde_json::json!(["REQ", subid, {"kinds": [1]}]).to_string();
-                if ws.send(WsMessage::Text(msg.into())).await.is_ok()
-                    && let Some(Ok(WsMessage::Text(resp))) = ws.next().await
-                        && resp.starts_with("[\"EOSE\"") {
-                            for _ in 0..count {
-                                match ws.next().await {
-                                    Some(Ok(WsMessage::Text(resp))) => {
-                                        if resp.starts_with("[\"EVENT\"") {
-                                            if let Some(ts) = parse_bp_timestamp(&resp) {
-                                                let now = std::time::SystemTime::now()
-                                                    .duration_since(std::time::UNIX_EPOCH)
-                                                    .unwrap()
-                                                    .as_micros() as u64;
-                                                if now >= ts {
-                                                    lats.lock().push(now - ts);
-                                                }
+                let msg = serde_json::json!(["REQ", subid, {"kinds": [1], "authors": [target_pubkey]}]).to_string();
+                if ws.send(WsMessage::Text(msg.into())).await.is_ok() {
+                    let mut got_eose = false;
+                    while let Some(Ok(WsMessage::Text(resp))) = ws.next().await {
+                        if resp.starts_with("[\"EOSE\"") {
+                            got_eose = true;
+                            break;
+                        }
+                    }
+                    if got_eose {
+                        for _ in 0..count {
+                            match ws.next().await {
+                                Some(Ok(WsMessage::Text(resp))) => {
+                                    if resp.starts_with("[\"EVENT\"") {
+                                        if let Some(ts) = parse_bp_timestamp(&resp) {
+                                            let now = std::time::SystemTime::now()
+                                                .duration_since(std::time::UNIX_EPOCH)
+                                                .unwrap()
+                                                .as_micros() as u64;
+                                            if now >= ts {
+                                                lats.lock().push(now - ts);
                                             }
-                                            succ.fetch_add(1, Ordering::Relaxed);
                                         }
+                                        succ.fetch_add(1, Ordering::Relaxed);
                                     }
-                                    _ => break,
                                 }
+                                _ => break,
                             }
                         }
+                    }
+                }
                 let _ = ws.close(None).await;
             }
         }));
@@ -73,39 +85,44 @@ pub async fn run_backpressure_suite(
         let url = url.to_string();
         let succ = slow_success.clone();
         let disc = slow_disconnected.clone();
+        let target_pubkey = bench_pubkey.clone();
 
         slow_tasks.push(tokio::spawn(async move {
             if let Ok(mut ws) = connect(&url).await {
                 let subid = format!("slow-{}", i);
-                let msg = serde_json::json!(["REQ", subid, {"kinds": [1]}]).to_string();
-                if ws.send(WsMessage::Text(msg.into())).await.is_ok()
-                    && let Some(Ok(WsMessage::Text(resp))) = ws.next().await
-                        && resp.starts_with("[\"EOSE\"") {
-                            for _ in 0..count {
-                                match ws.next().await {
-                                    Some(Ok(WsMessage::Text(resp))) => {
-                                        if resp.starts_with("[\"EVENT\"") {
-                                            succ.fetch_add(1, Ordering::Relaxed);
-                                            tokio::time::sleep(Duration::from_millis(slow_delay)).await;
-                                        }
+                let msg = serde_json::json!(["REQ", subid, {"kinds": [1], "authors": [target_pubkey]}]).to_string();
+                if ws.send(WsMessage::Text(msg.into())).await.is_ok() {
+                    let mut got_eose = false;
+                    while let Some(Ok(WsMessage::Text(resp))) = ws.next().await {
+                        if resp.starts_with("[\"EOSE\"") {
+                            got_eose = true;
+                            break;
+                        }
+                    }
+                    if got_eose {
+                        for _ in 0..count {
+                            match ws.next().await {
+                                Some(Ok(WsMessage::Text(resp))) => {
+                                    if resp.starts_with("[\"EVENT\"") {
+                                        succ.fetch_add(1, Ordering::Relaxed);
+                                        tokio::time::sleep(Duration::from_millis(slow_delay)).await;
                                     }
-                                    _ => {
-                                        disc.fetch_add(1, Ordering::Relaxed);
-                                        break;
-                                    }
+                                }
+                                _ => {
+                                    disc.fetch_add(1, Ordering::Relaxed);
+                                    break;
                                 }
                             }
                         }
+                    }
+                }
                 let _ = ws.close(None).await;
             }
         }));
     }
 
-    tokio::time::sleep(Duration::from_secs(1)).await;
+    tokio::time::sleep(Duration::from_millis(500)).await;
 
-    let secp = Secp256k1::new();
-    let secret = secp256k1::SecretKey::new(&mut secp256k1::rand::rng());
-    let keypair = Keypair::from_secret_key(&secp, &secret);
     let pub_start = Instant::now();
 
     if let Ok(mut ws_pub) = connect(url).await {
@@ -132,7 +149,6 @@ pub async fn run_backpressure_suite(
         }
         let _ = ws_pub.close(None).await;
     }
-
     // Wait for fast clients to receive events or timeout
     let timeout = Instant::now();
     loop {
