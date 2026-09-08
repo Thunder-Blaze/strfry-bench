@@ -274,3 +274,85 @@ async fn reqwest_or_hyper(url_str: &str) -> Result<String, String> {
         Ok(resp)
     }
 }
+
+pub struct ConstrainedRelayGuard {
+    child: Option<std::process::Child>,
+    scope_name: Option<String>,
+}
+
+impl ConstrainedRelayGuard {
+    pub fn stop(&mut self) {
+        if let Some(mut c) = self.child.take() {
+            let _ = c.kill();
+            let _ = c.wait();
+        }
+        if let Some(scope) = &self.scope_name {
+            let _ = Command::new("systemctl")
+                .args(["--user", "stop", scope])
+                .output();
+        }
+    }
+}
+
+impl Drop for ConstrainedRelayGuard {
+    fn drop(&mut self) {
+        self.stop();
+    }
+}
+
+pub async fn spawn_memory_constrained_relay(
+    binary_path: &Path,
+    db_dir: &Path,
+    port: u16,
+    mem_mb: usize,
+) -> Result<ConstrainedRelayGuard, String> {
+    let ws_url = format!("ws://127.0.0.1:{}", port);
+    let scope_name = format!("strfry-ooc-{}", rand::random::<u32>());
+
+    // 1. Try systemd-run --user --scope -p MemoryMax=256M
+    let mut cmd = Command::new("systemd-run");
+    cmd.args([
+        "--user",
+        "--scope",
+        &format!("--unit={}", scope_name),
+        &format!("-pMemoryMax={}M", mem_mb),
+        "--",
+    ]);
+    cmd.arg(binary_path);
+    cmd.args([
+        "--set", &format!("db={}/", db_dir.display()),
+        "--set", "relay.bind=127.0.0.1",
+        "--set", &format!("relay.port={}", port),
+        "relay",
+    ]);
+    cmd.stdout(Stdio::null());
+    cmd.stderr(Stdio::null());
+
+    let child = match cmd.spawn() {
+        Ok(c) => Some(c),
+        Err(_) => {
+            // Fallback to running directly if systemd-run is not supported
+            let mut direct = Command::new(binary_path);
+            direct.args([
+                "--set", &format!("db={}/", db_dir.display()),
+                "--set", "relay.bind=127.0.0.1",
+                "--set", &format!("relay.port={}", port),
+                "relay",
+            ]);
+            direct.stdout(Stdio::null());
+            direct.stderr(Stdio::null());
+            direct.spawn().ok()
+        }
+    };
+
+    if let Some(c) = child {
+        if wait_for_relay_ready(&ws_url, 10).await.is_ok() {
+            return Ok(ConstrainedRelayGuard {
+                child: Some(c),
+                scope_name: Some(scope_name),
+            });
+        }
+    }
+
+    Err("Failed to start memory-constrained relay".to_string())
+}

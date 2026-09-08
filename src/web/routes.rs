@@ -73,6 +73,7 @@ pub struct TriggerRunRequest {
     pub high_performance: Option<bool>,
     pub flamegraph: Option<bool>,
     pub alloc_tracker: Option<bool>,
+    pub full: Option<bool>,
 }
 pub async fn trigger_run(
     State(state): State<Arc<AppState>>,
@@ -121,6 +122,9 @@ pub async fn trigger_run(
     }
     if let Some(sh) = req.skip_heavy {
         cfg.skip_heavy = sh;
+    }
+    if let Some(f) = req.full {
+        cfg.full = f;
     }
     if let Some(hp) = req.high_performance {
         cfg.high_performance = hp;

@@ -57,7 +57,7 @@ impl<'a> SuiteRunner<'a> {
         progress_cb(&format!("Starting {}", suite.display_name()));
 
         let mut res = match suite {
-            Suite::Storage => storage::run(&self.relay_url, self.strfry_bin, self.db_dir, self.config.skip_heavy, &progress_cb).await,
+            Suite::Storage => storage::run(&self.relay_url, self.strfry_bin, self.db_dir, self.config.skip_heavy, self.config.full, &progress_cb).await,
             Suite::Ingestion => event::run_ingestion_suite(&self.relay_url, self.config.skip_heavy, &progress_cb).await,
             Suite::Concurrency => concurrency::run(&self.relay_url, self.config.skip_heavy, &progress_cb).await,
             Suite::Websockets => connections::run_websockets_suite(&self.relay_url, self.pid, self.config.skip_heavy, &progress_cb).await,

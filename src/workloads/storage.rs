@@ -11,6 +11,7 @@ pub async fn run(
     strfry_bin: Option<&Path>,
     db_dir: Option<&Path>,
     skip_heavy: bool,
+    full: bool,
     progress_cb: &(dyn Fn(&str) + Send + Sync),
 ) -> SuiteResult {
     let start = Instant::now();
@@ -100,18 +101,53 @@ pub async fn run(
         }
     }
 
+    // Out-of-Core memory-constrained test (256MB RAM ceiling via systemd-run cgroups v2 / Docker)
+    let mut ooc_time: Option<f64> = None;
+    let mut ooc_pages: Option<usize> = None;
+    if full {
+        if let (Some(bin), Some(db)) = (strfry_bin, db_dir) {
+            progress_cb("Storage Suite: Spawning Out-of-Core relay (256MB RAM ceiling)...");
+            match crate::relay::spawn_memory_constrained_relay(bin, db, 7778, 256).await {
+                Ok(mut ooc_guard) => {
+                    progress_cb("Storage Suite: Running Out-of-Core deep pagination under 256MB memory limit...");
+                    let (p_count, p_elapsed, _) = execute_paginate_bench("ws://127.0.0.1:7778", depth, concurrency).await;
+                    ooc_time = Some(p_elapsed);
+                    ooc_pages = Some(p_count);
+                    ooc_guard.stop();
+                }
+                Err(e) => {
+                    progress_cb(&format!("Storage Suite: Out-of-Core relay start failed: {}", e));
+                }
+            }
+        } else {
+            progress_cb("Storage Suite: Out-of-Core test requires local binary and database directory (skipped for live relay)");
+        }
+    }
+
     let mut log = format!(
         "- **Sequential scan throughput (events/sec):** {:.2}\n\
-         - **In-Core Pagination Time:** {:.2} seconds ({} pages retrieved)\n\
-         - **Out-of-Core Status:** Skipped (requires Docker/cgroups 256MB memory constraints)\n",
+         - **In-Core Pagination Time:** {:.2} seconds ({} pages retrieved)\n",
         scan_tps,
         paginate_time,
         pages
     );
+
+    if let Some(ot) = ooc_time {
+        let slowdown = if paginate_time > 0.0 { ot / paginate_time } else { 1.0 };
+        log.push_str(&format!(
+            "- **Out-of-Core Pagination Time (256MB RAM):** {:.2} seconds ({} pages retrieved)\n\
+             - **Out-of-Core Latency Amplification:** {:.2}x slower under memory constraint\n",
+            ot,
+            ooc_pages.unwrap_or(0),
+            slowdown
+        ));
+    } else {
+        log.push_str("- **Out-of-Core Status:** Skipped (enable \"Out-of-Core Stress (256MB RAM)\" to run memory-constrained test)\n");
+    }
+
     if !mdb_stat_out.trim().is_empty() {
         log.push_str(&format!("\n### DB Stat Output\n```\n{}\n```\n", mdb_stat_out.trim()));
     }
-
     let p50 = if !page_lats.is_empty() {
         let mut sorted = page_lats.clone();
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
@@ -120,6 +156,21 @@ pub async fn run(
         None
     };
     let elapsed = start.elapsed().as_secs_f64();
+
+    let mut metrics_map = serde_json::json!({
+        "scan_time_sec": scan_time,
+        "scan_tps": scan_tps,
+        "in_core_time": paginate_time,
+        "pagination_time_sec": paginate_time,
+        "pages_retrieved": pages,
+        "mdb_stat": mdb_stat_out,
+    });
+    if let Some(ot) = ooc_time {
+        metrics_map.as_object_mut().unwrap().insert("out_of_core_time".to_string(), serde_json::json!(ot));
+        if paginate_time > 0.0 {
+            metrics_map.as_object_mut().unwrap().insert("out_of_core_slowdown_x".to_string(), serde_json::json!(ot / paginate_time));
+        }
+    }
 
     SuiteResult {
         id: "storage".to_string(),
@@ -133,14 +184,7 @@ pub async fn run(
         p95_ms: None,
         p99_ms: None,
         memory_rss_mb: None,
-        metrics: serde_json::json!({
-            "scan_time_sec": scan_time,
-            "scan_tps": scan_tps,
-            "in_core_time": paginate_time,
-            "pagination_time_sec": paginate_time,
-            "pages_retrieved": pages,
-            "mdb_stat": mdb_stat_out,
-        }),
+        metrics: metrics_map,
         log_output: log,
     }
 }

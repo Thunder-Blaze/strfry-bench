@@ -791,6 +791,9 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                 <input type="checkbox" x-model="skipHeavy"> Skip Heavy (1M events)
                             </label>
                             <label class="checkbox-label" x-show="currentTargetMode === 'source'">
+                                <input type="checkbox" x-model="fullOutCore"> Out-of-Core Stress (256MB RAM)
+                            </label>
+                            <label class="checkbox-label" x-show="currentTargetMode === 'source'">
                                 <input type="checkbox" x-model="flamegraph"> CPU Flamegraph
                             </label>
                         </div>
@@ -1241,6 +1244,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                 compareCurrent: false,
                 highPerformance: false,
                 skipHeavy: true,
+                fullOutCore: false,
                 flamegraph: true,
                 liveUrl: 'ws://localhost:7777',
 
@@ -1487,6 +1491,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                         current: isCurrent,
                         high_performance: this.highPerformance,
                         skip_heavy: this.skipHeavy,
+                        full: this.fullOutCore,
                         flamegraph: this.flamegraph
                     };
 
