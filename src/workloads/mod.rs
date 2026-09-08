@@ -12,10 +12,11 @@ pub mod negentropy;
 pub mod plugin;
 pub mod cli_dict;
 pub mod os_stress;
+pub mod deterministic;
 
 use std::path::Path;
 use std::time::Instant;
-use crate::config::{BenchmarkConfig, Suite, SuiteResult, SuiteStatus};
+use crate::config::{BenchmarkConfig, Suite, SuiteResult};
 
 pub struct SuiteRunner<'a> {
     pub config: &'a BenchmarkConfig,
@@ -68,21 +69,7 @@ impl<'a> SuiteRunner<'a> {
             Suite::Os => os_stress::run_os_suite(&self.relay_url, self.db_dir, self.pid, self.config.skip_heavy, &progress_cb).await,
             Suite::Stress => os_stress::run_stress_suite(&self.relay_url, self.config.skip_heavy, &progress_cb).await,
             Suite::Backpressure => backpressure::run_backpressure_suite(&self.relay_url, self.config.skip_heavy, &progress_cb).await,
-            Suite::Deterministic => SuiteResult {
-                id: suite.id().to_string(),
-                name: suite.display_name().to_string(),
-                status: SuiteStatus::Completed,
-                elapsed_secs: 0.0,
-                throughput: None,
-                throughput_label: None,
-                p50_ms: None,
-                p90_ms: None,
-                p95_ms: None,
-                p99_ms: None,
-                memory_rss_mb: None,
-                metrics: serde_json::json!({ "info": "Deterministic metrics collected via perf_stat/alloc_tracker" }),
-                log_output: "Deterministic profiling configured via profiler module".to_string(),
-            },
+            Suite::Deterministic => deterministic::run(self.strfry_bin, &progress_cb).await,
         };
 
         if res.elapsed_secs == 0.0 {

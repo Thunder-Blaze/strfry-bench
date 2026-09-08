@@ -395,29 +395,95 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
             background: #06070a;
         }
 
-        /* 3-Column Stats Grid */
-        .stats-3col {
+        /* Dynamic Stats Grid (Auto-fits active panels) */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
         }
-
-        @media (max-width: 900px) { .stats-3col { grid-template-columns: 1fr; } }
 
         .stat-panel {
             background: #0b0d13;
             border: 1px solid var(--border);
             border-radius: 5px;
-            padding: 10px 12px;
+            padding: 10px 14px;
         }
 
         .stat-panel-title {
-            font-size: 9px;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
+            font-size: 10px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        /* Markdown Rendered Output */
+        .md-rendered-output {
+            background: #06070a;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 12px 14px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .md-kv-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+        }
+
+        .md-key {
+            color: var(--text-muted);
+            font-weight: 600;
+            min-width: 170px;
+        }
+
+        .md-val {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .md-heading {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-lavender);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 10px 0 6px 0;
+            border-bottom: 1px solid rgba(138, 153, 252, 0.2);
+            padding-bottom: 3px;
+        }
+
+        .md-code-block {
+            background: #030407;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #a0aec0;
+            line-height: 1.5;
+            margin: 6px 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .md-bullet-item {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+        .md-bullet {
+            color: var(--accent-lime);
+            margin-right: 4px;
         }
 
         .diff-table {
@@ -762,8 +828,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                 <div x-show="expandedSuites[s.id]" class="suite-collapse-body">
                                     <template x-if="completedMap[s.id]">
                                         <div>
-                                            <div class="stats-3col">
-                                                <div class="stat-panel">
+                                            <div class="stats-grid">
+                                                <div class="stat-panel" x-show="completedMap[s.id].throughput && completedMap[s.id].throughput > 0">
                                                     <div class="stat-panel-title">Throughput & Rate</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
                                                         <div>Rate: <span style="color: var(--accent-lime); font-weight: 700;" x-text="completedMap[s.id].throughput ? completedMap[s.id].throughput.toFixed(1) + ' ' + (completedMap[s.id].throughput_label || 'ops/s') : '-'"></span></div>
@@ -774,7 +840,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                         </template>
                                                     </div>
                                                 </div>
-                                                <div class="stat-panel">
+                                                <div class="stat-panel" x-show="completedMap[s.id].p50_ms && completedMap[s.id].p50_ms > 0">
                                                     <div class="stat-panel-title">Latency Quantiles</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
                                                         <div>P50: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p50_ms ? completedMap[s.id].p50_ms.toFixed(2) + ' ms' : '-'"></span></div>
@@ -782,24 +848,35 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                         <div>P99: <span style="color: var(--text-primary);" x-text="completedMap[s.id].p99_ms ? completedMap[s.id].p99_ms.toFixed(2) + ' ms' : '-'"></span></div>
                                                     </div>
                                                 </div>
-                                                <div class="stat-panel">
+                                                <div class="stat-panel" x-show="getSuiteSpecificMetrics(completedMap[s.id]).length > 0">
+                                                    <div class="stat-panel-title">Metrics & Verification</div>
+                                                    <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
+                                                        <template x-for="m in getSuiteSpecificMetrics(completedMap[s.id])" :key="m.key">
+                                                            <div>
+                                                                <span style="color: var(--text-muted);" x-text="m.key + ':'"></span>
+                                                                <span style="color: var(--accent-lime); font-weight: 600; margin-left: 6px;" x-text="m.val"></span>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </div>
+                                                <div class="stat-panel" x-show="(completedMap[s.id].elapsed_secs && completedMap[s.id].elapsed_secs > 0) || (completedMap[s.id].memory_rss_mb && completedMap[s.id].memory_rss_mb > 0)">
                                                     <div class="stat-panel-title">Resources & Wall Time</div>
                                                     <div style="font-family: var(--font-mono); font-size: 11px; line-height: 1.8;">
-                                                        <div>Memory RSS: <span style="color: var(--accent-lavender);" x-text="completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + ' MB' : '-'"></span></div>
-                                                        <div>Duration: <span style="color: var(--text-primary);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + ' s'"></span></div>
+                                                        <div x-show="completedMap[s.id].memory_rss_mb && completedMap[s.id].memory_rss_mb > 0">Memory RSS: <span style="color: var(--accent-lavender);" x-text="completedMap[s.id].memory_rss_mb ? completedMap[s.id].memory_rss_mb.toFixed(1) + ' MB' : '-'"></span></div>
+                                                        <div x-show="completedMap[s.id].elapsed_secs && completedMap[s.id].elapsed_secs > 0">Duration: <span style="color: var(--text-primary);" x-text="completedMap[s.id].elapsed_secs.toFixed(2) + ' s'"></span></div>
                                                         <div x-show="completedMap[s.id].metrics && completedMap[s.id].metrics.waf">WAF: <span style="color: var(--text-primary);" x-text="completedMap[s.id].metrics && completedMap[s.id].metrics.waf ? completedMap[s.id].metrics.waf.toFixed(2) + 'x' : ''"></span></div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                                 <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Raw Output</span>
                                                 <button class="btn-ghost" style="padding: 2px 6px; font-size: 10px;" @click="copyToClipboard(completedMap[s.id].log_output)">
                                                     <svg class="icon" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                                                     Copy
                                                 </button>
                                             </div>
-                                            <pre style="background: #06070a; border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-family: var(--font-mono); font-size: 11px; color: #a0aec0; line-height: 1.4; margin: 0;" x-text="completedMap[s.id].log_output"></pre>
+                                            <div class="md-rendered-output" x-html="renderMarkdown(completedMap[s.id].log_output)"></div>
                                         </div>
                                     </template>
                                 </div>
@@ -893,9 +970,9 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-show="getMatchingBaseSuite(s.id)" x-text="getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).elapsed_secs.toFixed(2) + 's' : ''"></span>
                                             </div>
                                             <div x-show="getMatchingBaseSuite(s.id)">
-                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
-                                                    <span style="color: var(--accent-lavender); font-weight: 700;" x-text="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).throughput ? getMatchingBaseSuite(s.id).throughput.toFixed(1) + ' ' + (getMatchingBaseSuite(s.id).throughput_label || 'ops/s') : '-'"></span>
-                                                    <span style="color: var(--text-secondary); margin-left: 8px;" x-show="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).p50_ms" x-text="'P50: ' + (getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).p50_ms ? getMatchingBaseSuite(s.id).p50_ms.toFixed(2) + 'ms' : '')"></span>
+                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;" x-show="getMatchingBaseSuite(s.id) && (getMatchingBaseSuite(s.id).throughput || getMatchingBaseSuite(s.id).p50_ms)">
+                                                    <span style="color: var(--accent-lavender); font-weight: 700;" x-show="getMatchingBaseSuite(s.id).throughput" x-text="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).throughput ? getMatchingBaseSuite(s.id).throughput.toFixed(1) + ' ' + (getMatchingBaseSuite(s.id).throughput_label || 'ops/s') : ''"></span>
+                                                    <span style="color: var(--text-secondary); margin-left: 8px;" x-show="getMatchingBaseSuite(s.id).p50_ms" x-text="'P50: ' + (getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).p50_ms ? getMatchingBaseSuite(s.id).p50_ms.toFixed(2) + 'ms' : '')"></span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="getMatchingBaseSuite(s.id) && getMatchingBaseSuite(s.id).metrics">
                                                     <template x-for="(v, k) in (getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).metrics : {})" :key="k">
@@ -905,7 +982,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                         </div>
                                                     </template>
                                                 </div>
-                                                <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="getMatchingBaseSuite(s.id) ? getMatchingBaseSuite(s.id).log_output : ''"></pre>
+                                                <div class="md-rendered-output" style="max-height: 250px; overflow-y: auto;" x-html="renderMarkdown(getMatchingBaseSuite(s.id).log_output)"></div>
                                             </div>
                                             <div x-show="!getMatchingBaseSuite(s.id)" style="color: var(--text-muted); font-size: 11px;">Not run on base commit.</div>
                                         </div>
@@ -917,8 +994,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                 <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
                                             </div>
                                             <div>
-                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
-                                                    <span style="color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                                <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;" x-show="s.throughput || s.p50_ms">
+                                                    <span style="color: var(--accent-lime); font-weight: 700;" x-show="s.throughput" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : ''"></span>
                                                     <span style="color: var(--text-secondary); margin-left: 8px;" x-show="s.p50_ms" x-text="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) + 'ms' : '')"></span>
                                                 </div>
                                                 <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="s.metrics">
@@ -929,7 +1006,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                         </div>
                                                     </template>
                                                 </div>
-                                                <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="s.log_output"></pre>
+                                                <div class="md-rendered-output" style="max-height: 250px; overflow-y: auto;" x-html="renderMarkdown(s.log_output)"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -950,8 +1027,8 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-lime); font-weight: 700;" x-text="'Commit: ' + (pastReportData.commit ? pastReportData.commit.substring(0, 8) : (pastReportData.git_commit ? pastReportData.git_commit.substring(0, 8) : 'HEAD'))"></span>
                                             <span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);" x-text="s.elapsed_secs.toFixed(2) + 's'"></span>
                                         </div>
-                                        <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;">
-                                            <span style="color: var(--accent-lime); font-weight: 700;" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : '-'"></span>
+                                        <div style="font-family: var(--font-mono); font-size: 12px; margin-bottom: 8px;" x-show="s.throughput || s.p50_ms">
+                                            <span style="color: var(--accent-lime); font-weight: 700;" x-show="s.throughput" x-text="s.throughput ? s.throughput.toFixed(1) + ' ' + (s.throughput_label || 'ops/s') : ''"></span>
                                             <span style="color: var(--text-secondary); margin-left: 8px;" x-show="s.p50_ms" x-text="'P50: ' + (s.p50_ms ? s.p50_ms.toFixed(2) + 'ms' : '')"></span>
                                         </div>
                                         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;" x-show="s.metrics">
@@ -962,7 +1039,7 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                                                         </div>
                                             </template>
                                         </div>
-                                        <pre style="background: #090a0f; border: 1px solid var(--border); border-radius: 4px; padding: 8px; font-family: var(--font-mono); font-size: 10px; color: #a0aec0; line-height: 1.4; margin: 0; max-height: 250px; overflow-y: auto;" x-text="s.log_output"></pre>
+                                        <div class="md-rendered-output" style="max-height: 250px; overflow-y: auto;" x-html="renderMarkdown(s.log_output)"></div>
                                     </div>
                                 </div>
                             </template>
@@ -1298,6 +1375,46 @@ pub const RENDERED_HTML: &str = r##"<!DOCTYPE html>
                     } catch (e) {}
                 },
 
+                renderMarkdown(text) {
+                    if (!text) return '';
+                    let escaped = text
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+
+                    escaped = escaped.replace(/```(?:[a-zA-Z]*)\n?([\s\S]*?)```/g, (match, code) => {
+                        return `<pre class="md-code-block">${code.trim()}</pre>`;
+                    });
+
+                    escaped = escaped.replace(/^###\s+(.*?)$/gm, '<div class="md-heading">$1</div>');
+                    escaped = escaped.replace(/^##\s+(.*?)$/gm, '<div class="md-heading" style="font-size: 13px;">$1</div>');
+
+                    escaped = escaped.replace(/^[-*]\s+\*\*(.*?)(?::\*\*|\*\*[:]*)\s*(.*?)$/gm, (match, key, val) => {
+                        return `<div class="md-kv-row"><span class="md-key">${key.trim()}:</span> <span class="md-val">${val.trim()}</span></div>`;
+                    });
+
+                    escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 700;">$1</strong>');
+
+                    escaped = escaped.replace(/^[-*]\s+(.*?)$/gm, '<div class="md-bullet-item"><span class="md-bullet">•</span> $1</div>');
+
+                    return escaped;
+                },
+
+                getSuiteSpecificMetrics(suite) {
+                    if (!suite || !suite.metrics || typeof suite.metrics !== 'object') return [];
+                    const res = [];
+                    for (const [k, v] of Object.entries(suite.metrics)) {
+                        if (k === 'process_rss_mb' || k === 'peak_rss_mb' || k === 'cpu_percent' || k === 'avg_cpu_percent' || k.includes('tps') || k === 'waf' || k === 'info') {
+                            continue;
+                        }
+                        let valStr = v;
+                        if (typeof v === 'number') {
+                            valStr = v.toLocaleString();
+                        }
+                        res.push({ key: k.replace(/_/g, ' '), val: valStr });
+                    }
+                    return res;
+                },
                 async fetchBranches() {
                     try {
                         const res = await fetch('/api/branches');
